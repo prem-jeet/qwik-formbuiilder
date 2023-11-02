@@ -5,7 +5,7 @@ export type AvailableInputTypes =
   | "text"
   | "select"
   | "checkbox"
-  | "textaea"
+  | "long-text"
   | "number"
   | "column"
   | "section";
@@ -14,7 +14,7 @@ const availableInputType: AvailableInputTypes[] = [
   "text",
   "select",
   "checkbox",
-  "textaea",
+  "long-text",
   "number",
   "column",
   "section",
@@ -54,7 +54,7 @@ export default component$<Props>(({ selectedInput }) => {
                     class="w-100 btn btn-light border border-2 "
                     onClick$={() => (selectedInput.value = type)}
                   >
-                    {type.toLocaleUpperCase()}
+                    {type.split("-").join(" ").toLocaleUpperCase()}
                   </button>
                 </div>
               </>

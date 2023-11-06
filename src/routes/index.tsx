@@ -2,7 +2,7 @@ import type { AvailableInputTypes } from "~/components/available-fields-menu/ava
 import type { DocumentHead } from "@builder.io/qwik-city";
 import { $, component$, useSignal, useTask$ } from "@builder.io/qwik";
 import AvailableFieldMenu from "~/components/available-fields-menu/availableFieldMenu";
-import FormLayoutDIsplay from "~/components/formLayoutDisplay/formLayoutDIsplay";
+import FormLayoutDisplay from "~/components/formLayoutDisplay/formLayoutDisplay";
 
 export interface InputObject {
   type: AvailableInputTypes;
@@ -15,8 +15,9 @@ export interface InputObject {
 export default component$(() => {
   const selectedInputType = useSignal<AvailableInputTypes | null>(null);
   const isPreview = useSignal(false);
-
+  const menuState = useSignal<"add" | "edit">("add");
   const formLayout = useSignal<InputObject[]>([]);
+  const editingFieldId = useSignal("");
   const insertIntoFormLayout = $((type: AvailableInputTypes) => {
     const newInputTypeObject: InputObject = {
       name: null,
@@ -43,7 +44,35 @@ export default component$(() => {
           <div class="row py-5 vh-100 justify-content-between">
             <div class="col-3">
               <div>
-                <AvailableFieldMenu selectedInput={selectedInputType} />
+                <div class="btn-group d-flex" role="group">
+                  <input
+                    type="radio"
+                    class="btn-check"
+                    checked={menuState.value === "add"}
+                    onClick$={() => (menuState.value = "add")}
+                    id="menuState_add"
+                  />
+                  <label class="btn btn-outline-dark" for="menuState_add">
+                    Input fields
+                  </label>
+                  <input
+                    type="radio"
+                    class="btn-check"
+                    checked={menuState.value === "edit"}
+                    onClick$={() => (menuState.value = "edit")}
+                    id="menuState_edit"
+                  />
+                  <label class="btn btn-outline-dark" for="menuState_edit">
+                    Edit field
+                  </label>
+                </div>
+              </div>
+              <div class="mt-3">
+                {menuState.value === "add" ? (
+                  <AvailableFieldMenu selectedInput={selectedInputType} />
+                ) : (
+                  <>edit field</>
+                )}
               </div>
             </div>
             <div class="col px-5">
@@ -57,10 +86,12 @@ export default component$(() => {
                     {isPreview.value ? "Hide " : "Show "}Preview
                   </button>
                 </div>
+                {editingFieldId}
                 <div>
-                  <FormLayoutDIsplay
+                  <FormLayoutDisplay
                     formLayout={formLayout}
                     isPreview={isPreview}
+                    editingFieldId={editingFieldId}
                   />
                 </div>
               </div>

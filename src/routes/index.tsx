@@ -1,7 +1,7 @@
 import type { AvailableInputTypes } from "~/components/available-fields-menu/availableFieldMenu";
 import { $, component$, useSignal, useStore } from "@builder.io/qwik";
 import AvailableFieldMenu from "~/components/available-fields-menu/availableFieldMenu";
-import FormLayoutDisplay from "~/components/formLayoutDisplay/formLayoutDisplay";
+import FormLayoutDisplay from "~/components/formLayout/formLayoutDisplay";
 
 export interface FormEntity {
   id: string;
@@ -91,7 +91,8 @@ export default component$(() => {
     }
   });
   const addInputField = $((newEntity: FormEntity) => {
-    formLayout.fields.push({ ...newEntity, parentId: selectedColmnId.value });
+    if (selectedColmnId.value)
+      formLayout.fields.push({ ...newEntity, parentId: selectedColmnId.value });
   });
   return (
     <>

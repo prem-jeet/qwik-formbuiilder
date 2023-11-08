@@ -30,7 +30,6 @@ const createEntity = (
 });
 
 export default component$(() => {
-  const selectedInputType = useSignal<AvailableInputTypes | null>(null);
   const isPreview = useSignal(false);
   const menuState = useSignal<"add" | "edit">("add");
   const initailId = (() => crypto.randomUUID())();
@@ -54,6 +53,9 @@ export default component$(() => {
     })),
     fields: [],
   });
+
+  const selectedSectionId = useSignal("");
+  const selectedColmnId = useSignal(formLayout.columns[0].id);
 
   const addColumnAfter = $((columnId: string) => {
     const columns = [...formLayout.columns];
@@ -88,7 +90,9 @@ export default component$(() => {
       formLayout.columns.push({ ...newColumn });
     }
   });
-
+  const addInputField = $((newEntity: FormEntity) => {
+    formLayout.fields.push({ ...newEntity, parentId: selectedColmnId.value });
+  });
   return (
     <>
       <div class="vw-100 vh-100 overflow-hidden">
@@ -121,7 +125,7 @@ export default component$(() => {
               </div>
               <div class="mt-3">
                 {menuState.value === "add" ? (
-                  <AvailableFieldMenu selectedInput={selectedInputType} />
+                  <AvailableFieldMenu addInputField={addInputField} />
                 ) : (
                   <>edit field</>
                 )}
@@ -144,8 +148,11 @@ export default component$(() => {
                     isPreview={isPreview}
                     addColumnAfter={addColumnAfter}
                     addSectionAfter={addSectionAfter}
+                    selectedColmnId={selectedColmnId}
+                    selectedSectionId={selectedSectionId}
                   />
-                  {/* <pre>{JSON.stringify(formLayout, null, 2)}</pre> */}
+
+                  {/* <pre>{JSON.stringify(formLayout.fields, null, 2)}</pre> */}
                 </div>
               </div>
             </div>

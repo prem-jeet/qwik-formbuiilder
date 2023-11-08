@@ -1,5 +1,6 @@
-import type { Signal } from "@builder.io/qwik";
-import { component$, useComputed$, useSignal } from "@builder.io/qwik";
+import type { QRL } from "@builder.io/qwik";
+import { $, component$, useComputed$, useSignal } from "@builder.io/qwik";
+import type { FormEntity } from "~/routes";
 
 export type AvailableInputTypes =
   | "text"
@@ -16,9 +17,10 @@ const availableInputType: AvailableInputTypes[] = [
   "number",
 ];
 interface Props {
-  selectedInput: Signal<AvailableInputTypes | null>;
+  addInputField: QRL<(newEntity: FormEntity) => {}>;
 }
-export default component$<Props>(({ selectedInput }) => {
+
+export default component$<Props>(({ addInputField }) => {
   const fieldSearchFilter = useSignal("");
 
   const filteredAvailableInputTypes = useComputed$(() => {
@@ -26,6 +28,19 @@ export default component$<Props>(({ selectedInput }) => {
       type.includes(fieldSearchFilter.value.toLocaleLowerCase())
     );
   });
+
+  const createInput = $((type: AvailableInputTypes) => {
+    const newEntity: FormEntity = {
+      label: null,
+      name: null,
+      id: (() => crypto.randomUUID())(),
+      parentId: null,
+      type,
+    };
+
+    addInputField({ ...newEntity });
+  });
+
   return (
     <>
       <div>
@@ -48,7 +63,7 @@ export default component$<Props>(({ selectedInput }) => {
                   <button
                     type="button"
                     class="w-100 btn btn-light border border-2 "
-                    onClick$={() => (selectedInput.value = type)}
+                    onClick$={() => createInput(type)}
                   >
                     {type.split("-").join(" ").toLocaleUpperCase()}
                   </button>

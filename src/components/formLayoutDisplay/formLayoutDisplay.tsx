@@ -6,12 +6,21 @@ import type { FormEntity, FormLayout } from "~/routes";
 interface Props {
   formLayout: FormLayout;
   isPreview: Signal<boolean>;
+  selectedColmnId: Signal<string>;
+  selectedSectionId: Signal<string>;
   addColumnAfter: QRL<(columnId: string) => {}>;
   addSectionAfter: QRL<(sectionId: string) => {}>;
 }
 
 export default component$<Props>(
-  ({ formLayout, isPreview, addColumnAfter, addSectionAfter }) => {
+  ({
+    formLayout,
+    isPreview,
+    addColumnAfter,
+    addSectionAfter,
+    selectedColmnId,
+    selectedSectionId,
+  }) => {
     useStyles$(`.hover-outline:hover{
     outline: 1px solid black;
   }
@@ -50,9 +59,6 @@ export default component$<Props>(
     const filterById = (array: FormEntity[], id: string) =>
       array.filter(({ parentId }) => parentId === id);
 
-    const selectedColmnId = useSignal("");
-    const selectedSectionId = useSignal("");
-
     const clearSelections = $((e: QwikMouseEvent) => {
       e.stopPropagation();
       selectedColmnId.value = "";
@@ -84,9 +90,11 @@ export default component$<Props>(
                   >
                     <i class="bi bi-plus" />
                   </button>
-                  <button class="btn btn-outline-dark btn-sm rounded-2 ms-2 p-0 px-1">
-                    <i class="bi bi-x" />
-                  </button>
+                  {formLayout.sections.length > 1 && (
+                    <button class="btn btn-outline-dark btn-sm rounded-2 ms-2 p-0 px-1">
+                      <i class="bi bi-x" />
+                    </button>
+                  )}
                 </div>
               </div>
             ) : (
@@ -130,6 +138,7 @@ export default component$<Props>(
             ))}
           </section>
         ))}
+
         {isPreview.value && (
           <div class="row justify-content-end mt-4">
             <div class="col-auto">

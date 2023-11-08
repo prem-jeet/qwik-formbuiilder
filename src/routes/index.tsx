@@ -1,39 +1,81 @@
 import type { AvailableInputTypes } from "~/components/available-fields-menu/availableFieldMenu";
 import type { DocumentHead } from "@builder.io/qwik-city";
-import { $, component$, useSignal, useTask$ } from "@builder.io/qwik";
+import { $, component$, useSignal, useStore } from "@builder.io/qwik";
 import AvailableFieldMenu from "~/components/available-fields-menu/availableFieldMenu";
 import FormLayoutDisplay from "~/components/formLayoutDisplay/formLayoutDisplay";
 
-export interface InputObject {
-  type: AvailableInputTypes;
+export interface FormEntity {
+  id: string;
+  type: AvailableInputTypes | "column" | "section";
   label: string | null;
   name: string | null;
-  mendatory: boolean;
-  id: string;
+  mendatory?: boolean;
+  parentId: string | null;
 }
+
+export interface FormLayout {
+  sections: FormEntity[];
+  columns: FormEntity[];
+  fields: FormEntity[];
+}
+
+const createEntity = (
+  type: AvailableInputTypes | "column" | "section",
+  parentId?: string
+) => ({
+  id: (() => crypto.randomUUID())(),
+  type: type,
+  label: null,
+  name: null,
+  parentId: parentId || null,
+});
 
 export default component$(() => {
   const selectedInputType = useSignal<AvailableInputTypes | null>(null);
   const isPreview = useSignal(false);
   const menuState = useSignal<"add" | "edit">("add");
-  const formLayout = useSignal<InputObject[]>([]);
-  const editingFieldId = useSignal("");
-  const insertIntoFormLayout = $((type: AvailableInputTypes) => {
-    const newInputTypeObject: InputObject = {
-      name: null,
-      label: null,
-      mendatory: false,
-      type: type,
+  const initailId = (() => crypto.randomUUID())();
+
+  const formLayout = useStore<FormLayout>({
+    sections: [
+      {
+        id: initailId,
+        type: "section",
+        label: null,
+        name: null,
+        parentId: null,
+      },
+    ],
+    columns: new Array(2).fill(0).map(() => ({
       id: (() => crypto.randomUUID())(),
-    };
-    formLayout.value = [...formLayout.value, { ...newInputTypeObject }];
+      type: "column",
+      label: null,
+      name: null,
+      parentId: initailId,
+    })),
+    fields: [],
   });
 
-  useTask$(({ track }) => {
+  /* useTask$(({ track }) => {
     track(() => selectedInputType.value);
     if (selectedInputType.value) {
       insertIntoFormLayout(selectedInputType.value);
       selectedInputType.value = null;
+    }
+  }); */
+
+  const addColumnAfter = $((columnId: string) => {
+    const columns = [...formLayout.columns];
+    const columnIndex = columns.findIndex(({ id }) => id === columnId);
+    if (columnIndex >= 0) {
+      const newEntity = createEntity("column");
+      newEntity.parentId = columns[columnIndex].parentId;
+
+      formLayout.columns = [
+        ...columns.slice(0, columnIndex + 1),
+        { ...newEntity },
+        ...columns.slice(columnIndex + 1),
+      ];
     }
   });
 
@@ -86,13 +128,13 @@ export default component$(() => {
                     {isPreview.value ? "Hide " : "Show "}Preview
                   </button>
                 </div>
-                {editingFieldId}
                 <div>
                   <FormLayoutDisplay
                     formLayout={formLayout}
                     isPreview={isPreview}
-                    editingFieldId={editingFieldId}
+                    addColumnAfter={addColumnAfter}
                   />
+                  {/* <pre>{JSON.stringify(formLayout, null, 2)}</pre> */}
                 </div>
               </div>
             </div>

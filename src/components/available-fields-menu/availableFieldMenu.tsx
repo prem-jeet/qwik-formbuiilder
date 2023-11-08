@@ -6,9 +6,7 @@ export type AvailableInputTypes =
   | "select"
   | "checkbox"
   | "long-text"
-  | "number"
-  | "column"
-  | "section";
+  | "number";
 
 const availableInputType: AvailableInputTypes[] = [
   "text",
@@ -16,8 +14,6 @@ const availableInputType: AvailableInputTypes[] = [
   "checkbox",
   "long-text",
   "number",
-  "column",
-  "section",
 ];
 interface Props {
   selectedInput: Signal<AvailableInputTypes | null>;

@@ -1,5 +1,4 @@
 import type { AvailableInputTypes } from "~/components/available-fields-menu/availableFieldMenu";
-import type { DocumentHead } from "@builder.io/qwik-city";
 import { $, component$, useSignal, useStore } from "@builder.io/qwik";
 import AvailableFieldMenu from "~/components/available-fields-menu/availableFieldMenu";
 import FormLayoutDisplay from "~/components/formLayoutDisplay/formLayoutDisplay";
@@ -56,26 +55,37 @@ export default component$(() => {
     fields: [],
   });
 
-  /* useTask$(({ track }) => {
-    track(() => selectedInputType.value);
-    if (selectedInputType.value) {
-      insertIntoFormLayout(selectedInputType.value);
-      selectedInputType.value = null;
-    }
-  }); */
-
   const addColumnAfter = $((columnId: string) => {
     const columns = [...formLayout.columns];
     const columnIndex = columns.findIndex(({ id }) => id === columnId);
     if (columnIndex >= 0) {
-      const newEntity = createEntity("column");
-      newEntity.parentId = columns[columnIndex].parentId;
+      const newColumn = createEntity("column");
+      newColumn.parentId = columns[columnIndex].parentId;
 
       formLayout.columns = [
         ...columns.slice(0, columnIndex + 1),
-        { ...newEntity },
+        { ...newColumn },
         ...columns.slice(columnIndex + 1),
       ];
+    }
+  });
+
+  const addSectionAfter = $((sectionId?: string) => {
+    const sections = [...formLayout.sections];
+    const sectionIndex = sections.findIndex(({ id }) => id === sectionId);
+
+    const newSection = createEntity("section");
+    newSection.parentId = null;
+
+    formLayout.sections = [
+      ...sections.slice(0, sectionIndex + 1),
+      { ...newSection },
+      ...sections.slice(sectionIndex + 1),
+    ];
+    for (let i = 0; i < 2; i++) {
+      const newColumn = createEntity("column");
+      newColumn.parentId = newSection.id;
+      formLayout.columns.push({ ...newColumn });
     }
   });
 
@@ -133,6 +143,7 @@ export default component$(() => {
                     formLayout={formLayout}
                     isPreview={isPreview}
                     addColumnAfter={addColumnAfter}
+                    addSectionAfter={addSectionAfter}
                   />
                   {/* <pre>{JSON.stringify(formLayout, null, 2)}</pre> */}
                 </div>
@@ -144,13 +155,3 @@ export default component$(() => {
     </>
   );
 });
-
-export const head: DocumentHead = {
-  title: "Welcome to Qwik",
-  meta: [
-    {
-      name: "description",
-      content: "Qwik site description",
-    },
-  ],
-};

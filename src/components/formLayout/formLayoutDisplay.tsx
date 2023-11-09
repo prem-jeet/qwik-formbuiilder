@@ -9,6 +9,7 @@ interface Props {
   isPreview: Signal<boolean>;
   selectedColmnId: Signal<string>;
   selectedSectionId: Signal<string>;
+  selectedFieldId: Signal<string>;
   addColumnAfter: QRL<(columnId: string) => {}>;
   addSectionAfter: QRL<(sectionId: string) => {}>;
 }
@@ -21,6 +22,7 @@ export default component$<Props>(
     addSectionAfter,
     selectedColmnId,
     selectedSectionId,
+    selectedFieldId,
   }) => {
     useStyles$(`.hover-outline:hover{
     outline: 1px solid black;
@@ -33,6 +35,11 @@ export default component$<Props>(
     outline: 1px solid black;
   }
   .selected_section{
+    outline: 1px solid black;
+  }
+   .selected_field{
+    padding: 10px;
+    border-radius: 0.5rem;
     outline: 1px solid black;
   }`);
 
@@ -64,15 +71,17 @@ export default component$<Props>(
       e.stopPropagation();
       selectedColmnId.value = "";
       selectedSectionId.value = "";
+      selectedFieldId.value = "";
     });
 
     return (
       <>
         {formLayout.sections.map(async (section) => (
           <section
-            class={`${
-              selectedSectionId.value === section.id && "selected_section"
-            } row rounded-3 border border-2 py-3 mb-2 formbuilder_section`}
+            class={`
+            ${selectedSectionId.value === section.id && "selected_section "} 
+            ${hoveringOn.value === "section" && "hover-outline "}
+            row rounded-3 border border-2 py-3 mb-2 formbuilder_section`}
             key={section.id}
             onClick$={async (e) => {
               await clearSelections(e);
@@ -102,7 +111,10 @@ export default component$<Props>(
               section.label && <h3 class="mb-2 px-3">{section.label}</h3>
             )}
             {filterById(formLayout.columns, section.id).map((column) => (
-              <div class="col align-self-stretch" key={column.id}>
+              <div
+                class="col align-self-stretch formbuilder_section"
+                key={column.id}
+              >
                 <div
                   class={`${!isPreview.value && "p-3"} 
                 ${
@@ -117,25 +129,40 @@ export default component$<Props>(
                   }}
                 >
                   <div class="row align-items-center">
-                    <div class="text-muted col">
-                      {column.label || "(no label)"}
-                    </div>
-                    {selectedColmnId.value === column.id && (
-                      <div class="col-auto">
-                        <button
-                          class="btn btn-outline-dark btn-sm rounded-2 p-0 px-1"
-                          onClick$={() => addColumnAfter(column.id)}
-                        >
-                          <i class="bi bi-plus" />
-                        </button>
-                        <button class="btn btn-outline-dark btn-sm rounded-2 ms-2 p-0 px-1">
-                          <i class="bi bi-x" />
-                        </button>
-                      </div>
+                    {selectedColmnId.value === column.id ? (
+                      <>
+                        <div class="text-muted col">
+                          {column.label || "(no label)"}
+                        </div>
+                        <div class="col-auto">
+                          <button
+                            class="btn btn-outline-dark btn-sm rounded-2 p-0 px-1"
+                            onClick$={() => addColumnAfter(column.id)}
+                          >
+                            <i class="bi bi-plus" />
+                          </button>
+                          <button class="btn btn-outline-dark btn-sm rounded-2 ms-2 p-0 px-1">
+                            <i class="bi bi-x" />
+                          </button>
+                        </div>
+                      </>
+                    ) : (
+                      column.label && (
+                        <div class="text-muted col">{column.label}</div>
+                      )
                     )}
                   </div>
                   {filterById(formLayout.fields, column.id).map((field) => (
-                    <div class="mt-3" key={field.id}>
+                    <div
+                      class={`${
+                        selectedFieldId.value === field.id && "selected_field"
+                      } mt-3  formBuilder_inputField`}
+                      key={field.id}
+                      onClick$={async (e) => {
+                        await clearSelections(e);
+                        selectedFieldId.value = field.id;
+                      }}
+                    >
                       <FormFieldDisplay fieldEntity={field} />
                     </div>
                   ))}

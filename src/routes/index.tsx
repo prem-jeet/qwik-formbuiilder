@@ -55,6 +55,7 @@ export default component$(() => {
   });
 
   const selectedSectionId = useSignal("");
+  const selectedFieldId = useSignal("");
   const selectedColmnId = useSignal(formLayout.columns[0].id);
 
   const addColumnAfter = $((columnId: string) => {
@@ -151,6 +152,7 @@ export default component$(() => {
                     addSectionAfter={addSectionAfter}
                     selectedColmnId={selectedColmnId}
                     selectedSectionId={selectedSectionId}
+                    selectedFieldId={selectedFieldId}
                   />
 
                   {/* <pre>{JSON.stringify(formLayout.fields, null, 2)}</pre> */}

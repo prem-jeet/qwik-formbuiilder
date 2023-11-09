@@ -13,6 +13,7 @@ interface Props {
   addColumnAfter: QRL<(columnId: string) => {}>;
   addSectionAfter: QRL<(sectionId: string) => {}>;
   removeField: QRL<(fieldId: string) => {}>;
+  moveFieldsToNewColumn: QRL<(fieldId: string) => {}>;
 }
 
 export default component$<Props>(
@@ -25,6 +26,7 @@ export default component$<Props>(
     selectedSectionId,
     selectedFieldId,
     removeField,
+    moveFieldsToNewColumn,
   }) => {
     useStyles$(`.hover-outline:hover{
     outline: 1px solid black;
@@ -161,10 +163,11 @@ export default component$<Props>(
                       )
                     )}
                   </div>
-                  {filterById(formLayout.fields, column.id).map((field) => (
-                    <div
-                      role="button"
-                      class={`
+                  {filterById(formLayout.fields, column.id).map(
+                    (field, index) => (
+                      <div
+                        role="button"
+                        class={`
                       ${
                         selectedFieldId.value === field.id &&
                         !isPreview.value &&
@@ -172,25 +175,30 @@ export default component$<Props>(
                       } 
                      
                       mt-1  formBuilder_inputField p-2 rounded-3`}
-                      key={field.id}
-                      onClick$={async (e) => {
-                        await clearSelections(e);
-                        selectedFieldId.value = field.id;
-                      }}
-                    >
-                      <FormFieldDisplay
-                        fieldEntity={field}
-                        selectedFieldId={selectedFieldId}
-                        removeField={removeField}
-                      />
-                    </div>
-                  ))}
+                        key={field.id}
+                        onClick$={async (e) => {
+                          await clearSelections(e);
+                          selectedFieldId.value = field.id;
+                        }}
+                      >
+                        <FormFieldDisplay
+                          fieldEntity={field}
+                          selectedFieldId={selectedFieldId}
+                          removeField={removeField}
+                          moveFieldsToNewColumn={moveFieldsToNewColumn}
+                          shouldAllowDetach={index > 0}
+                        />
+                      </div>
+                    )
+                  )}
                 </div>
               </div>
             ))}
           </section>
         ))}
-
+        <div>section --- {selectedSectionId.value}</div>
+        <div>column ---{selectedColmnId.value}</div>
+        <div>field --- {selectedFieldId.value}</div>
         {isPreview.value && (
           <div class="row justify-content-end mt-4">
             <div class="col-auto">

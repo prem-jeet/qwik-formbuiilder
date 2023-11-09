@@ -12,10 +12,18 @@ interface Props {
   fieldEntity: FormEntity;
   selectedFieldId: Signal<string>;
   removeField: QRL<(fieldId: string) => {}>;
+  moveFieldsToNewColumn: QRL<(fieldId: string) => {}>;
+  shouldAllowDetach: boolean;
 }
 
 export default component$<Props>(
-  ({ fieldEntity, selectedFieldId, removeField }) => {
+  ({
+    fieldEntity,
+    selectedFieldId,
+    removeField,
+    moveFieldsToNewColumn,
+    shouldAllowDetach,
+  }) => {
     useStylesScoped$(`
   .form-field:hover{
     outline: 1px solid black;
@@ -88,13 +96,16 @@ export default component$<Props>(
             <div
               class={`${fieldEntity.type === "checkbox" && "ms-auto"} col-auto`}
             >
-              <button
-                class="btn btn-outline-dark btn-sm p-0 px-1"
-                data-bs-toggle="tooltip"
-                title="Tooltip on top"
-              >
-                <i class="bi bi-box-arrow-in-up-right"></i>
-              </button>
+              {shouldAllowDetach && (
+                <button
+                  class="btn btn-outline-dark btn-sm p-0 px-1"
+                  data-bs-toggle="tooltip"
+                  title="Tooltip on top"
+                  onClick$={() => moveFieldsToNewColumn(fieldEntity.id)}
+                >
+                  <i class="bi bi-box-arrow-in-up-right"></i>
+                </button>
+              )}
               <button
                 class="ms-2 btn btn-outline-dark btn-sm  p-0 px-1"
                 onClick$={() => removeField(fieldEntity.id)}

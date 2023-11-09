@@ -70,6 +70,7 @@ export default component$(() => {
         { ...newColumn },
         ...columns.slice(columnIndex + 1),
       ];
+      return newColumn.id;
     }
   });
 
@@ -105,6 +106,29 @@ export default component$(() => {
         ...formLayout.fields.slice(0, fieldIndex),
         ...formLayout.fields.slice(fieldIndex + 1),
       ];
+    }
+  });
+
+  const moveFieldsToNewColumn = $(async (startingFieldId: string) => {
+    selectedFieldId.value = "";
+    const fieldIndex = formLayout.fields.findIndex(
+      (field) => field.id === startingFieldId
+    );
+    const parentColumnId = formLayout.fields[fieldIndex].parentId;
+
+    if (parentColumnId) {
+      const newColumnId = await addColumnAfter(parentColumnId);
+      if (newColumnId) {
+        formLayout.fields = formLayout.fields.map((field, index) => {
+          if (index < fieldIndex) {
+            return field;
+          }
+          return {
+            ...field,
+            parentId: newColumnId,
+          };
+        });
+      }
     }
   });
   return (
@@ -166,6 +190,7 @@ export default component$(() => {
                     selectedSectionId={selectedSectionId}
                     selectedFieldId={selectedFieldId}
                     removeField={removeField}
+                    moveFieldsToNewColumn={moveFieldsToNewColumn}
                   />
 
                   {/* <pre>{JSON.stringify(formLayout.fields, null, 2)}</pre> */}

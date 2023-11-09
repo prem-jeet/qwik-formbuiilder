@@ -187,6 +187,7 @@ export default component$<Props>(
                           removeField={removeField}
                           moveFieldsToNewColumn={moveFieldsToNewColumn}
                           shouldAllowDetach={index > 0}
+                          isPreview={isPreview}
                         />
                       </div>
                     )

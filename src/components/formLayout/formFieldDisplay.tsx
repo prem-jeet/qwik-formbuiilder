@@ -1,11 +1,5 @@
 import type { QRL, Signal } from "@builder.io/qwik";
-import {
-  $,
-  component$,
-  useOn,
-  useSignal,
-  useStylesScoped$,
-} from "@builder.io/qwik";
+import { $, component$, useStylesScoped$ } from "@builder.io/qwik";
 import type { FormEntity } from "~/routes";
 
 interface Props {
@@ -14,6 +8,7 @@ interface Props {
   removeField: QRL<(fieldId: string) => {}>;
   moveFieldsToNewColumn: QRL<(fieldId: string) => {}>;
   shouldAllowDetach: boolean;
+  isPreview: Signal<boolean>;
 }
 
 export default component$<Props>(
@@ -23,10 +18,14 @@ export default component$<Props>(
     removeField,
     moveFieldsToNewColumn,
     shouldAllowDetach,
+    isPreview,
   }) => {
     useStylesScoped$(`
   .form-field:hover{
     outline: 1px solid black;
+  }
+  .outline-none:hover{
+      outline: none;
   }
   `);
     const generateField = $(() => {
@@ -69,21 +68,11 @@ export default component$<Props>(
         );
       }
     });
-    const hoveringOver = useSignal(false);
-    useOn(
-      "mouseenter",
-      $(() => {
-        hoveringOver.value = true;
-      })
-    );
-    useOn(
-      "mouseleave",
-      $(() => {
-        hoveringOver.value = false;
-      })
-    );
+
     return (
-      <div class="p-2 rounded-3 form-field">
+      <div
+        class={`p-2 rounded-3 form-field ${isPreview.value && "outline-none"}`}
+      >
         <div class="row">
           {fieldEntity.type !== "checkbox" && (
             <div class="col">
@@ -92,7 +81,7 @@ export default component$<Props>(
               </label>
             </div>
           )}
-          {selectedFieldId.value === fieldEntity.id && (
+          {!isPreview.value && selectedFieldId.value === fieldEntity.id && (
             <div
               class={`${fieldEntity.type === "checkbox" && "ms-auto"} col-auto`}
             >

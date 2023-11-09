@@ -95,6 +95,18 @@ export default component$(() => {
     if (selectedColmnId.value)
       formLayout.fields.push({ ...newEntity, parentId: selectedColmnId.value });
   });
+
+  const removeField = $((fieldId: string) => {
+    const fieldIndex = formLayout.fields.findIndex(
+      (field) => field.id === fieldId
+    );
+    if (fieldIndex >= 0) {
+      formLayout.fields = [
+        ...formLayout.fields.slice(0, fieldIndex),
+        ...formLayout.fields.slice(fieldIndex + 1),
+      ];
+    }
+  });
   return (
     <>
       <div class="vw-100 vh-100 overflow-hidden">
@@ -153,6 +165,7 @@ export default component$(() => {
                     selectedColmnId={selectedColmnId}
                     selectedSectionId={selectedSectionId}
                     selectedFieldId={selectedFieldId}
+                    removeField={removeField}
                   />
 
                   {/* <pre>{JSON.stringify(formLayout.fields, null, 2)}</pre> */}

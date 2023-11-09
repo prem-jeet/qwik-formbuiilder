@@ -12,6 +12,7 @@ interface Props {
   selectedFieldId: Signal<string>;
   addColumnAfter: QRL<(columnId: string) => {}>;
   addSectionAfter: QRL<(sectionId: string) => {}>;
+  removeField: QRL<(fieldId: string) => {}>;
 }
 
 export default component$<Props>(
@@ -23,6 +24,7 @@ export default component$<Props>(
     selectedColmnId,
     selectedSectionId,
     selectedFieldId,
+    removeField,
   }) => {
     useStyles$(`.hover-outline:hover{
     outline: 1px solid black;
@@ -34,10 +36,9 @@ export default component$<Props>(
     background: hsl(210,16.7%,95.6%);
     outline: 1px solid black;
   }
-  .selected_section, .selected_field{
+  .selected_section{
     outline: 1px solid black;
-  }
-   |`);
+  }`);
 
     const hoveringOn = useSignal("");
 
@@ -53,11 +54,6 @@ export default component$<Props>(
         if ([...target.classList].includes("formbuilder_column")) {
           hoveringOn.value = "column";
         }
-        if ([...target.classList].includes("formBuilder_inputField")) {
-          hoveringOn.value = "field";
-        }
-
-        // No manual clean up required!
       })
     );
 
@@ -75,6 +71,7 @@ export default component$<Props>(
       <>
         {formLayout.sections.map(async (section) => (
           <section
+            role="button"
             class={`
             ${
               selectedSectionId.value === section.id &&
@@ -124,7 +121,12 @@ export default component$<Props>(
                 <div
                   class={`
                   rounded-3   h-100  formbuilder_column
-                  ${!isPreview.value && "p-3 bg-light"} 
+                  ${!isPreview.value && "p-3 bg-light"}
+                  ${
+                    hoveringOn.value === "column" &&
+                    !isPreview.value &&
+                    "hover-outline "
+                  }
                   ${
                     selectedColmnId.value === column.id &&
                     !isPreview.value &&
@@ -168,8 +170,8 @@ export default component$<Props>(
                         !isPreview.value &&
                         "selected_field"
                       } 
-                      ${hoveringOn.value === "field" && "hover-outline"}
-                      mt-3  formBuilder_inputField p-2 rounded-3`}
+                     
+                      mt-1  formBuilder_inputField p-2 rounded-3`}
                       key={field.id}
                       onClick$={async (e) => {
                         await clearSelections(e);
@@ -179,6 +181,7 @@ export default component$<Props>(
                       <FormFieldDisplay
                         fieldEntity={field}
                         selectedFieldId={selectedFieldId}
+                        removeField={removeField}
                       />
                     </div>
                   ))}

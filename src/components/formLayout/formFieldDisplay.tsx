@@ -1,20 +1,19 @@
-import { $, component$ } from "@builder.io/qwik";
+import type { Signal } from "@builder.io/qwik";
+import { $, component$, useOn, useSignal } from "@builder.io/qwik";
 import type { FormEntity } from "~/routes";
 
 interface Props {
   fieldEntity: FormEntity;
+  selectedFieldId: Signal<string>;
 }
 
-export default component$<Props>(({ fieldEntity }) => {
+export default component$<Props>(({ fieldEntity, selectedFieldId }) => {
   const generateField = $(() => {
     const { type, id } = fieldEntity;
 
     if (type === "long-text") {
       return (
         <>
-          <label for={id} class="form-label text-muted">
-            {fieldEntity.label || "(no label)"}
-          </label>
           <textarea class="form-control" id={id} />
         </>
       );
@@ -29,29 +28,62 @@ export default component$<Props>(({ fieldEntity }) => {
       );
     } else if (type === "select") {
       return (
-        <select class="form-select">
-          <option selected>Select menu</option>
-        </select>
+        <>
+          <select class="form-select" id={id}>
+            <option selected>Select menu</option>
+          </select>
+        </>
       );
     } else if (type === "number") {
       return (
         <>
-          <label for={id} class="form-label text-muted">
-            {fieldEntity.label || "(no label)"}
-          </label>
           <input type="number" class="form-control" id={id} />
         </>
       );
     } else {
       return (
         <>
-          <label for={id} class="form-label text-muted">
-            {fieldEntity.label || "(no label)"}
-          </label>
           <input type="text" class="form-control" id={id} />
         </>
       );
     }
   });
-  return <>{generateField()}</>;
+  const shouldShowActions = useSignal(false);
+  useOn(
+    "mouseenter",
+    $(() => {
+      shouldShowActions.value = true;
+    })
+  );
+  useOn(
+    "mouseleave",
+    $(() => {
+      shouldShowActions.value = false;
+    })
+  );
+  return (
+    <div>
+      {fieldEntity.type !== "checkbox" && (
+        <div class="row">
+          <div class="col">
+            <label for={fieldEntity.id} class="form-label text-muted">
+              {fieldEntity.label || "(no label)"}
+            </label>
+          </div>
+          {(shouldShowActions.value ||
+            selectedFieldId.value === fieldEntity.id) && (
+            <div class="col-auto">
+              <button class="btn btn-outline-dark btn-sm p-0 px-1">
+                <i class="bi bi-box-arrow-in-up-right"></i>
+              </button>
+              <button class="ms-2 btn btn-outline-dark btn-sm  p-0 px-1">
+                <i class="bi bi-x"></i>
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+      {generateField()}
+    </div>
+  );
 });

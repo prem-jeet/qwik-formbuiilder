@@ -34,20 +34,17 @@ export default component$<Props>(
     background: hsl(210,16.7%,95.6%);
     outline: 1px solid black;
   }
-  .selected_section{
+  .selected_section, .selected_field{
     outline: 1px solid black;
   }
-   .selected_field{
-    padding: 10px;
-    border-radius: 0.5rem;
-    outline: 1px solid black;
-  }`);
+   |`);
 
     const hoveringOn = useSignal("");
 
     useOn(
       "mousemove",
       $((event) => {
+        if (isPreview.value) return;
         const target = event.target as HTMLElement;
 
         if ([...target.classList].includes("formbuilder_section")) {
@@ -79,8 +76,16 @@ export default component$<Props>(
         {formLayout.sections.map(async (section) => (
           <section
             class={`
-            ${selectedSectionId.value === section.id && "selected_section "} 
-            ${hoveringOn.value === "section" && "hover-outline "}
+            ${
+              selectedSectionId.value === section.id &&
+              !isPreview.value &&
+              "selected_section "
+            } 
+            ${
+              hoveringOn.value === "section" &&
+              !isPreview.value &&
+              "hover-outline "
+            }
             row rounded-3 border border-2 py-3 mb-2 formbuilder_section`}
             key={section.id}
             onClick$={async (e) => {
@@ -88,7 +93,7 @@ export default component$<Props>(
               selectedSectionId.value = section.id;
             }}
           >
-            {selectedSectionId.value === section.id ? (
+            {selectedSectionId.value === section.id && !isPreview.value ? (
               <div class="d-flex mb-2 px-3">
                 <div class="col text-muted">
                   {section.label || "(no label)"}
@@ -114,22 +119,24 @@ export default component$<Props>(
               <div
                 class="col align-self-stretch formbuilder_section"
                 key={column.id}
+                role="button"
               >
                 <div
-                  class={`${!isPreview.value && "p-3"} 
-                ${
-                  selectedColmnId.value === column.id
-                    ? "selected_column"
-                    : "bg-light"
-                } 
-                  rounded-3  h-100  formbuilder_column`}
+                  class={`
+                  rounded-3   h-100  formbuilder_column
+                  ${!isPreview.value && "p-3 bg-light"} 
+                  ${
+                    selectedColmnId.value === column.id &&
+                    !isPreview.value &&
+                    "selected_column"
+                  }`}
                   onClick$={async (e) => {
                     await clearSelections(e);
                     selectedColmnId.value = column.id;
                   }}
                 >
                   <div class="row align-items-center">
-                    {selectedColmnId.value === column.id ? (
+                    {selectedColmnId.value === column.id && !isPreview.value ? (
                       <>
                         <div class="text-muted col">
                           {column.label || "(no label)"}
@@ -154,16 +161,25 @@ export default component$<Props>(
                   </div>
                   {filterById(formLayout.fields, column.id).map((field) => (
                     <div
-                      class={`${
-                        selectedFieldId.value === field.id && "selected_field"
-                      } mt-3  formBuilder_inputField`}
+                      role="button"
+                      class={`
+                      ${
+                        selectedFieldId.value === field.id &&
+                        !isPreview.value &&
+                        "selected_field"
+                      } 
+                      ${hoveringOn.value === "field" && "hover-outline"}
+                      mt-3  formBuilder_inputField p-2 rounded-3`}
                       key={field.id}
                       onClick$={async (e) => {
                         await clearSelections(e);
                         selectedFieldId.value = field.id;
                       }}
                     >
-                      <FormFieldDisplay fieldEntity={field} />
+                      <FormFieldDisplay
+                        fieldEntity={field}
+                        selectedFieldId={selectedFieldId}
+                      />
                     </div>
                   ))}
                 </div>

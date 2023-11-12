@@ -2,7 +2,6 @@ import type { AvailableInputTypes } from "~/components/available-fields-menu/ava
 import { $, component$, useSignal, useStore } from "@builder.io/qwik";
 import AvailableFieldMenu from "~/components/available-fields-menu/availableFieldMenu";
 import FormLayoutDisplay from "~/components/formLayout/formLayoutDisplay";
-
 export interface FormEntity {
   id: string;
   type: AvailableInputTypes | "column" | "section";

@@ -15,6 +15,7 @@ export default component$(() => {
    *
    * Don't remove the `<head>` and `<body>` elements.
    */
+
   useStyles$(BootstrapStyles);
   return (
     <QwikCityProvider>

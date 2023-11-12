@@ -1,6 +1,7 @@
 import type { QRL, Signal } from "@builder.io/qwik";
 import { $, component$, useStylesScoped$ } from "@builder.io/qwik";
 import type { FormEntity } from "~/routes";
+import TooltipButton from "../buttons/tooltipButton";
 
 interface Props {
   fieldEntity: FormEntity;
@@ -98,12 +99,21 @@ export default component$<Props>(
                   <i class="bi bi-box-arrow-in-up-right"></i>
                 </button>
               )}
-              <button
+              {/* <button
                 class="ms-2 btn btn-outline-dark btn-sm  p-0 px-1"
                 onClick$={() => duplicateField(fieldEntity.id)}
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
+                title="Duplicate field"
               >
                 <i class="bi bi-copy"></i>
-              </button>
+              </button> */}
+              <TooltipButton
+                buttonClass="btn-outline-dark p-0 px-1"
+                size="sm"
+                bootstrapIconName="copy"
+                tootlipText="duplicate field"
+              />
               <button
                 class="ms-2 btn btn-outline-dark btn-sm  p-0 px-1"
                 onClick$={() => removeField(fieldEntity.id)}

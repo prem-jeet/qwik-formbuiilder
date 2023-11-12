@@ -62,7 +62,7 @@ export default component$<Props>(({ addInputField }) => {
                 <div class="col">
                   <button
                     type="button"
-                    class="w-100 btn btn-light border border-2 "
+                    class="w-100 btn btn-light btn-sm border border-2 "
                     onClick$={() => createInput(type)}
                   >
                     {type.split("-").join(" ").toLocaleUpperCase()}

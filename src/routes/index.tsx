@@ -153,7 +153,6 @@ export default component$(() => {
     <>
       <div class="vw-100 vh-100 overflow-hidden">
         <div class="container-fluid">
-          {" "}
           <div class="row px-4 py-5 vh-100 justify-content-between ">
             <div class="col-2">
               <div>

@@ -13,6 +13,7 @@ interface Props {
   addColumnAfter: QRL<(columnId: string) => {}>;
   addSectionAfter: QRL<(sectionId: string) => {}>;
   removeField: QRL<(fieldId: string) => {}>;
+  duplicateField: QRL<(fieldId: string) => {}>;
   moveFieldsToNewColumn: QRL<(fieldId: string) => {}>;
 }
 
@@ -26,6 +27,7 @@ export default component$<Props>(
     selectedSectionId,
     selectedFieldId,
     removeField,
+    duplicateField,
     moveFieldsToNewColumn,
   }) => {
     useStyles$(`.hover-outline:hover{
@@ -188,6 +190,7 @@ export default component$<Props>(
                           moveFieldsToNewColumn={moveFieldsToNewColumn}
                           shouldAllowDetach={index > 0}
                           isPreview={isPreview}
+                          duplicateField={duplicateField}
                         />
                       </div>
                     )

@@ -109,6 +109,24 @@ export default component$(() => {
     }
   });
 
+  const duplicateField = $((fieldId: string) => {
+    const fieldIndex = formLayout.fields.findIndex(
+      (field) => field.id === fieldId
+    );
+    const newField = { ...formLayout.fields[fieldIndex] };
+    newField.id = crypto.randomUUID();
+    newField.name = null;
+    if (newField.label) {
+      newField.label = newField.label + " copy";
+    }
+
+    formLayout.fields = [
+      ...formLayout.fields.slice(0, fieldIndex + 1),
+      { ...newField },
+      ...formLayout.fields.slice(fieldIndex + 1),
+    ];
+  });
+
   const moveFieldsToNewColumn = $(async (startingFieldId: string) => {
     selectedFieldId.value = "";
     const fieldIndex = formLayout.fields.findIndex(
@@ -134,9 +152,10 @@ export default component$(() => {
   return (
     <>
       <div class="vw-100 vh-100 overflow-hidden">
-        <div class="container">
-          <div class="row py-5 vh-100 justify-content-between">
-            <div class="col-3">
+        <div class="container-fluid">
+          {" "}
+          <div class="row px-4 py-5 vh-100 justify-content-between ">
+            <div class="col-2">
               <div>
                 <div class="btn-group d-flex" role="group">
                   <input
@@ -191,6 +210,7 @@ export default component$(() => {
                     selectedFieldId={selectedFieldId}
                     removeField={removeField}
                     moveFieldsToNewColumn={moveFieldsToNewColumn}
+                    duplicateField={duplicateField}
                   />
 
                   {/* <pre>{JSON.stringify(formLayout.fields, null, 2)}</pre> */}

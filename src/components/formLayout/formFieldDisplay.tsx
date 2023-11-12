@@ -6,6 +6,7 @@ interface Props {
   fieldEntity: FormEntity;
   selectedFieldId: Signal<string>;
   removeField: QRL<(fieldId: string) => {}>;
+  duplicateField: QRL<(fieldId: string) => {}>;
   moveFieldsToNewColumn: QRL<(fieldId: string) => {}>;
   shouldAllowDetach: boolean;
   isPreview: Signal<boolean>;
@@ -16,6 +17,7 @@ export default component$<Props>(
     fieldEntity,
     selectedFieldId,
     removeField,
+    duplicateField,
     moveFieldsToNewColumn,
     shouldAllowDetach,
     isPreview,
@@ -88,13 +90,20 @@ export default component$<Props>(
               {shouldAllowDetach && (
                 <button
                   class="btn btn-outline-dark btn-sm p-0 px-1"
-                  data-bs-toggle="tooltip"
-                  title="Tooltip on top"
                   onClick$={() => moveFieldsToNewColumn(fieldEntity.id)}
+                  data-bs-toggle="tooltip"
+                  data-bs-placement="top"
+                  title="Move current field and following fields to new column"
                 >
                   <i class="bi bi-box-arrow-in-up-right"></i>
                 </button>
               )}
+              <button
+                class="ms-2 btn btn-outline-dark btn-sm  p-0 px-1"
+                onClick$={() => duplicateField(fieldEntity.id)}
+              >
+                <i class="bi bi-copy"></i>
+              </button>
               <button
                 class="ms-2 btn btn-outline-dark btn-sm  p-0 px-1"
                 onClick$={() => removeField(fieldEntity.id)}

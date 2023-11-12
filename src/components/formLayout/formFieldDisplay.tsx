@@ -89,31 +89,26 @@ export default component$<Props>(
               class={`${fieldEntity.type === "checkbox" && "ms-auto"} col-auto`}
             >
               {shouldAllowDetach && (
-                <button
-                  class="btn btn-outline-dark btn-sm p-0 px-1"
-                  onClick$={() => moveFieldsToNewColumn(fieldEntity.id)}
-                  data-bs-toggle="tooltip"
-                  data-bs-placement="top"
-                  title="Move current field and following fields to new column"
-                >
-                  <i class="bi bi-box-arrow-in-up-right"></i>
-                </button>
+                <span onClick$={() => moveFieldsToNewColumn(fieldEntity.id)}>
+                  <TooltipButton
+                    buttonClass=" btn-outline-dark p-0 px-1"
+                    size="sm"
+                    tootlipText="Move current field and following fields to new column"
+                    bootstrapIconName="box-arrow-in-up-right"
+                  />
+                </span>
               )}
-              {/* <button
-                class="ms-2 btn btn-outline-dark btn-sm  p-0 px-1"
+              <span
+                class="ms-2"
                 onClick$={() => duplicateField(fieldEntity.id)}
-                data-bs-toggle="tooltip"
-                data-bs-placement="top"
-                title="Duplicate field"
               >
-                <i class="bi bi-copy"></i>
-              </button> */}
-              <TooltipButton
-                buttonClass="btn-outline-dark p-0 px-1"
-                size="sm"
-                bootstrapIconName="copy"
-                tootlipText="duplicate field"
-              />
+                <TooltipButton
+                  buttonClass="btn-outline-dark p-0 px-1"
+                  size="sm"
+                  bootstrapIconName="copy"
+                  tootlipText="Duplicate field"
+                />
+              </span>
               <button
                 class="ms-2 btn btn-outline-dark btn-sm  p-0 px-1"
                 onClick$={() => removeField(fieldEntity.id)}

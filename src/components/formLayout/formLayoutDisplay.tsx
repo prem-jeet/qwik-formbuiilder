@@ -17,6 +17,7 @@ interface Props {
   duplicateField: QRL<(fieldId: string) => {}>;
   moveFieldsToNewColumn: QRL<(fieldId: string) => {}>;
   deleteColumnWithFields: QRL<(columnId: string) => {}>;
+  deleteSectionWithColumns: QRL<(columnId: string) => {}>;
 }
 
 export default component$<Props>(
@@ -32,6 +33,7 @@ export default component$<Props>(
     duplicateField,
     moveFieldsToNewColumn,
     deleteColumnWithFields,
+    deleteSectionWithColumns,
   }) => {
     useStyles$(`.hover-outline:hover{
     outline: 1px solid black;
@@ -110,9 +112,30 @@ export default component$<Props>(
                     <i class="bi bi-plus" />
                   </button>
                   {formLayout.sections.length > 1 && (
-                    <button class="btn btn-outline-dark btn-sm rounded-2 ms-2 p-0 px-1">
-                      <i class="bi bi-x" />
-                    </button>
+                    <span class="ms-2">
+                      <Modal
+                        triggerBIcon="x"
+                        triggerClass="btn-outline-dark btn-sm rounded-2 p-0 px-1"
+                        id="delete-section"
+                        headerText="Delete Section"
+                        escapeClose
+                        bodyText="Are you sure you want to delete the Section? All the fields and  columns will be moved to the previous column"
+                      >
+                        <div q:slot="footer">
+                          <button
+                            class="btn btn-secondary btn-sm"
+                            onClick$={() =>
+                              deleteSectionWithColumns(section.id)
+                            }
+                          >
+                            Delete entire section with columns
+                          </button>
+                          <button class="ms-2 btn btn-dark btn-sm">
+                            Delete section
+                          </button>
+                        </div>
+                      </Modal>
+                    </span>
                   )}
                 </div>
               </div>

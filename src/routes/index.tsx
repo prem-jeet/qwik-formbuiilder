@@ -181,6 +181,19 @@ export default component$(() => {
       return true;
     });
   });
+  const deleteSectionWithColumns = $((sectionId: string) => {
+    formLayout.columns = formLayout.columns.filter((column) => {
+      if (column.parentId === sectionId) {
+        deleteColumnWithFields(column.id);
+        return false;
+      }
+      return true;
+    });
+
+    formLayout.sections = formLayout.sections.filter(
+      (section) => section.id !== sectionId
+    );
+  });
   return (
     <>
       <div class="vw-100 vh-100 overflow-hidden">
@@ -243,9 +256,8 @@ export default component$(() => {
                     moveFieldsToNewColumn={moveFieldsToNewColumn}
                     duplicateField={duplicateField}
                     deleteColumnWithFields={deleteColumnWithFields}
+                    deleteSectionWithColumns={deleteSectionWithColumns}
                   />
-
-                  {/* <pre>{JSON.stringify(formLayout.fields, null, 2)}</pre> */}
                 </div>
               </div>
             </div>

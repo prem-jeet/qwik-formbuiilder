@@ -16,6 +16,7 @@ interface Props {
   removeField: QRL<(fieldId: string) => {}>;
   duplicateField: QRL<(fieldId: string) => {}>;
   moveFieldsToNewColumn: QRL<(fieldId: string) => {}>;
+  deleteColumnWithFields: QRL<(columnId: string) => {}>;
 }
 
 export default component$<Props>(
@@ -30,6 +31,7 @@ export default component$<Props>(
     removeField,
     duplicateField,
     moveFieldsToNewColumn,
+    deleteColumnWithFields,
   }) => {
     useStyles$(`.hover-outline:hover{
     outline: 1px solid black;
@@ -119,7 +121,9 @@ export default component$<Props>(
             )}
             {filterById(formLayout.columns, section.id).map((column) => (
               <div
-                class="col align-self-stretch formbuilder_section"
+                class={`${
+                  section.childCount! > 1 ? "col" : "col-6"
+                } align-self-stretch formbuilder_section`}
                 key={column.id}
                 role="button"
               >
@@ -155,25 +159,32 @@ export default component$<Props>(
                           >
                             <i class="bi bi-plus" />
                           </button>
-                          <span class="ms-2">
-                            <Modal
-                              triggerBIcon="x"
-                              triggerClass="btn-outline-dark btn-sm rounded-2 p-0 px-1"
-                              id="delete-column"
-                              headerText="Delete column"
-                              escapeClose
-                              bodyText="Are you sure you want to delete the column? All the fields in the column will be moved to the previous column"
-                            >
-                              <div q:slot="footer">
-                                <button class="btn btn-secondary btn-sm">
-                                  Delete entire column with fields
-                                </button>
-                                <button class="ms-2 btn btn-dark btn-sm">
-                                  Delete column
-                                </button>
-                              </div>
-                            </Modal>
-                          </span>
+                          {section.childCount! > 1 && (
+                            <span class="ms-2">
+                              <Modal
+                                triggerBIcon="x"
+                                triggerClass="btn-outline-dark btn-sm rounded-2 p-0 px-1"
+                                id="delete-column"
+                                headerText="Delete column"
+                                escapeClose
+                                bodyText="Are you sure you want to delete the column? All the fields in the column will be moved to the previous column"
+                              >
+                                <div q:slot="footer">
+                                  <button
+                                    class="btn btn-secondary btn-sm"
+                                    onClick$={() =>
+                                      deleteColumnWithFields(column.id)
+                                    }
+                                  >
+                                    Delete entire column with fields
+                                  </button>
+                                  <button class="ms-2 btn btn-dark btn-sm">
+                                    Delete column
+                                  </button>
+                                </div>
+                              </Modal>
+                            </span>
+                          )}
                         </div>
                       </>
                     ) : (

@@ -9,6 +9,7 @@ export interface FormEntity {
   name: string | null;
   mendatory?: boolean;
   parentId: string | null;
+  childCount?: number;
 }
 
 export interface FormLayout {
@@ -41,6 +42,7 @@ export default component$(() => {
         label: null,
         name: null,
         parentId: null,
+        childCount: 2,
       },
     ],
     columns: new Array(2).fill(0).map(() => ({
@@ -51,6 +53,22 @@ export default component$(() => {
       parentId: initailId,
     })),
     fields: [],
+  });
+  const incrementChildCount = $((key: "sections" | "columns", id: string) => {
+    const index = formLayout[key as keyof FormLayout].findIndex(
+      (item: { id: string }) => item.id === id
+    );
+    if (index >= 0) {
+      formLayout[key as keyof FormLayout][index].childCount! += 1;
+    }
+  });
+  const decrementChildCount = $((key: "sections" | "columns", id: string) => {
+    const index = formLayout[key as keyof FormLayout].findIndex(
+      (item: { id: string }) => item.id === id
+    );
+    if (index >= 0) {
+      formLayout[key as keyof FormLayout][index].childCount! -= 1;
+    }
   });
 
   const selectedSectionId = useSignal("");
@@ -69,6 +87,8 @@ export default component$(() => {
         { ...newColumn },
         ...columns.slice(columnIndex + 1),
       ];
+
+      incrementChildCount("sections", newColumn.parentId!);
       return newColumn.id;
     }
   });
@@ -148,6 +168,19 @@ export default component$(() => {
       }
     }
   });
+
+  const deleteColumnWithFields = $((columnId: string) => {
+    formLayout.fields = formLayout.fields.filter(
+      (field) => field.parentId !== columnId
+    );
+    formLayout.columns = formLayout.columns.filter((column) => {
+      if (columnId === column.id && column.parentId) {
+        decrementChildCount("sections", column.parentId);
+        return false;
+      }
+      return true;
+    });
+  });
   return (
     <>
       <div class="vw-100 vh-100 overflow-hidden">
@@ -209,6 +242,7 @@ export default component$(() => {
                     removeField={removeField}
                     moveFieldsToNewColumn={moveFieldsToNewColumn}
                     duplicateField={duplicateField}
+                    deleteColumnWithFields={deleteColumnWithFields}
                   />
 
                   {/* <pre>{JSON.stringify(formLayout.fields, null, 2)}</pre> */}

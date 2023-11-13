@@ -70,7 +70,7 @@ export default component$<Props>(
                 ></button>
               </div>
               <div class="modal-body">{bodyText}</div>
-              <div class="modal-footer">
+              <div class="modal-footer" data-bs-dismiss="modal">
                 <Slot name="footer" />
               </div>
             </div>

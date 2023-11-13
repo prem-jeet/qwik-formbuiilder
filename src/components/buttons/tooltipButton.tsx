@@ -1,4 +1,12 @@
-import { component$, useSignal, useVisibleTask$ } from "@builder.io/qwik";
+import type { QRL, NoSerialize } from "@builder.io/qwik";
+import {
+  $,
+  component$,
+  noSerialize,
+  useSignal,
+  useStore,
+  useVisibleTask$,
+} from "@builder.io/qwik";
 import { Tooltip } from "bootstrap";
 
 interface Props {
@@ -8,6 +16,7 @@ interface Props {
   tootltipPoition?: "top" | "right" | "bottom" | "left";
   tootlipText?: string;
   buttonClass?: string;
+  onClick: QRL<() => {}>;
 }
 
 export default component$<Props>(
@@ -18,10 +27,27 @@ export default component$<Props>(
     bootstrapIconName,
     label,
     size,
+    onClick,
   }) => {
-    const ref = useSignal<HTMLElement>();
+    const ref = useSignal<Element>();
+    const toltip = useStore<{
+      tootltipInstance: NoSerialize<{ [key: string]: any }>;
+    }>({
+      tootltipInstance: noSerialize({}),
+    });
+
+    const close = $(() => {
+      onClick();
+      if (toltip.tootltipInstance) {
+        toltip.tootltipInstance.hide();
+      }
+    });
+
     useVisibleTask$(() => {
-      new Tooltip(ref.value as unknown as string);
+      if (ref.value) {
+        const t = new Tooltip(ref.value);
+        toltip.tootltipInstance = noSerialize(t);
+      }
     });
     return (
       <button
@@ -30,6 +56,7 @@ export default component$<Props>(
         data-bs-placement={tootltipPoition || "top"}
         title={tootlipText}
         ref={ref}
+        onClick$={close}
       >
         {label && <span>{label}</span>}
         {bootstrapIconName && (

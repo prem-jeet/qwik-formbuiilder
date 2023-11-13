@@ -4,6 +4,7 @@ import { $, component$, useOn, useSignal, useStyles$ } from "@builder.io/qwik";
 import type { FormEntity, FormLayout } from "~/routes";
 import FormFieldDisplay from "./formFieldDisplay";
 import Modal from "../modals/modal";
+import Tooltip from "../tooltip";
 
 interface Props {
   formLayout: FormLayout;
@@ -142,16 +143,17 @@ export default component$<Props>(
             ) : (
               section.label && <h3 class="mb-2 px-3">{section.label}</h3>
             )}
-            {filterById(formLayout.columns, section.id).map((column) => (
-              <div
-                class={`${
-                  section.childCount! > 1 ? "col" : "col-6"
-                } align-self-stretch formbuilder_section`}
-                key={column.id}
-                role="button"
-              >
+            {filterById(formLayout.columns, section.id).map(
+              (column, columnIndex) => (
                 <div
-                  class={`
+                  class={`${
+                    section.childCount! > 1 ? "col" : "col-6"
+                  } align-self-stretch formbuilder_section`}
+                  key={column.id}
+                  role="button"
+                >
+                  <div
+                    class={`
                   rounded-3   h-100  formbuilder_column
                   ${!isPreview.value && "p-3 bg-light"}
                   ${
@@ -164,63 +166,71 @@ export default component$<Props>(
                     !isPreview.value &&
                     "selected_column"
                   }`}
-                  onClick$={async (e) => {
-                    await clearSelections(e);
-                    selectedColmnId.value = column.id;
-                  }}
-                >
-                  <div class="row align-items-center">
-                    {selectedColmnId.value === column.id && !isPreview.value ? (
-                      <>
-                        <div class="text-muted col">
-                          {column.label || "(no label)"}
-                        </div>
-                        <div class="col-auto">
-                          <button
-                            class="btn btn-outline-dark btn-sm rounded-2 p-0 px-1"
-                            onClick$={() => addColumnAfter(column.id)}
-                          >
-                            <i class="bi bi-plus" />
-                          </button>
-                          {section.childCount! > 1 && (
-                            <span class="ms-2">
-                              <Modal
-                                triggerBIcon="x"
-                                triggerClass="btn-outline-dark btn-sm rounded-2 p-0 px-1"
-                                id="delete-column"
-                                headerText="Delete column"
-                                escapeClose
-                                bodyText="Are you sure you want to delete the column? All the fields in the column will be moved to the previous column"
-                              >
-                                <div q:slot="footer">
-                                  <button
-                                    class="btn btn-secondary btn-sm"
-                                    onClick$={() =>
-                                      deleteColumnWithFields(column.id)
-                                    }
-                                  >
-                                    Delete entire column with fields
-                                  </button>
-                                  <button class="ms-2 btn btn-dark btn-sm">
-                                    Delete column
-                                  </button>
-                                </div>
-                              </Modal>
-                            </span>
-                          )}
-                        </div>
-                      </>
-                    ) : (
-                      column.label && (
-                        <div class="text-muted col">{column.label}</div>
-                      )
-                    )}
-                  </div>
-                  {filterById(formLayout.fields, column.id).map(
-                    (field, index) => (
-                      <div
-                        role="button"
-                        class={`
+                    onClick$={async (e) => {
+                      await clearSelections(e);
+                      selectedColmnId.value = column.id;
+                    }}
+                  >
+                    <div class="row align-items-center">
+                      {selectedColmnId.value === column.id &&
+                      !isPreview.value ? (
+                        <>
+                          <div class="text-muted col">
+                            {column.label || "(no label)"}
+                          </div>
+                          <div class="col-auto">
+                            {columnIndex > 0 && (
+                              <Tooltip title="Move current column and following columns to new section">
+                                <button class="btn btn-outline-dark btn-sm rounded-2 p-0 px-1">
+                                  <i class="bi bi-box-arrow-in-up-right" />
+                                </button>
+                              </Tooltip>
+                            )}
+                            <button
+                              class="btn btn-outline-dark btn-sm rounded-2 ms-2 p-0 px-1"
+                              onClick$={() => addColumnAfter(column.id)}
+                            >
+                              <i class="bi bi-plus" />
+                            </button>
+                            {section.childCount! > 1 && (
+                              <span class="ms-2">
+                                <Modal
+                                  triggerBIcon="x"
+                                  triggerClass="btn-outline-dark btn-sm rounded-2 p-0 px-1"
+                                  id="delete-column"
+                                  headerText="Delete column"
+                                  escapeClose
+                                  bodyText="Are you sure you want to delete the column? All the fields in the column will be moved to the previous column"
+                                >
+                                  <div q:slot="footer">
+                                    <button
+                                      class="btn btn-secondary btn-sm"
+                                      onClick$={() =>
+                                        deleteColumnWithFields(column.id)
+                                      }
+                                    >
+                                      Delete entire column with fields
+                                    </button>
+                                    <button class="ms-2 btn btn-dark btn-sm">
+                                      Delete column
+                                    </button>
+                                  </div>
+                                </Modal>
+                              </span>
+                            )}
+                          </div>
+                        </>
+                      ) : (
+                        column.label && (
+                          <div class="text-muted col">{column.label}</div>
+                        )
+                      )}
+                    </div>
+                    {filterById(formLayout.fields, column.id).map(
+                      (field, index) => (
+                        <div
+                          role="button"
+                          class={`
                       ${
                         selectedFieldId.value === field.id &&
                         !isPreview.value &&
@@ -228,27 +238,28 @@ export default component$<Props>(
                       } 
                      
                       mt-1  formBuilder_inputField p-2 rounded-3`}
-                        key={field.id}
-                        onClick$={async (e) => {
-                          await clearSelections(e);
-                          selectedFieldId.value = field.id;
-                        }}
-                      >
-                        <FormFieldDisplay
-                          fieldEntity={field}
-                          selectedFieldId={selectedFieldId}
-                          removeField={removeField}
-                          moveFieldsToNewColumn={moveFieldsToNewColumn}
-                          shouldAllowDetach={index > 0}
-                          isPreview={isPreview}
-                          duplicateField={duplicateField}
-                        />
-                      </div>
-                    )
-                  )}
+                          key={field.id}
+                          onClick$={async (e) => {
+                            await clearSelections(e);
+                            selectedFieldId.value = field.id;
+                          }}
+                        >
+                          <FormFieldDisplay
+                            fieldEntity={field}
+                            selectedFieldId={selectedFieldId}
+                            removeField={removeField}
+                            moveFieldsToNewColumn={moveFieldsToNewColumn}
+                            shouldAllowDetach={index > 0}
+                            isPreview={isPreview}
+                            duplicateField={duplicateField}
+                          />
+                        </div>
+                      )
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              )
+            )}
           </section>
         ))}
 

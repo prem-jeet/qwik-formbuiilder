@@ -89,24 +89,21 @@ export default component$<Props>(
               class={`${fieldEntity.type === "checkbox" && "ms-auto"} col-auto`}
             >
               {shouldAllowDetach && (
-                <span onClick$={() => moveFieldsToNewColumn(fieldEntity.id)}>
-                  <TooltipButton
-                    buttonClass=" btn-outline-dark p-0 px-1"
-                    size="sm"
-                    tootlipText="Move current field and following fields to new column"
-                    bootstrapIconName="box-arrow-in-up-right"
-                  />
-                </span>
+                <TooltipButton
+                  buttonClass=" btn-outline-dark p-0 px-1"
+                  size="sm"
+                  tootlipText="Move current field and following fields to new column"
+                  bootstrapIconName="box-arrow-in-up-right"
+                  onClick={$(() => moveFieldsToNewColumn(fieldEntity.id))}
+                />
               )}
-              <span
-                class="ms-2"
-                onClick$={() => duplicateField(fieldEntity.id)}
-              >
+              <span class="ms-2">
                 <TooltipButton
                   buttonClass="btn-outline-dark p-0 px-1"
                   size="sm"
                   bootstrapIconName="copy"
                   tootlipText="Duplicate field"
+                  onClick={$(() => duplicateField(fieldEntity.id))}
                 />
               </span>
               <button

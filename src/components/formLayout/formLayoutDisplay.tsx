@@ -3,6 +3,7 @@ import { $, component$, useOn, useSignal, useStyles$ } from "@builder.io/qwik";
 
 import type { FormEntity, FormLayout } from "~/routes";
 import FormFieldDisplay from "./formFieldDisplay";
+import Modal from "../modals/modal";
 
 interface Props {
   formLayout: FormLayout;
@@ -154,9 +155,25 @@ export default component$<Props>(
                           >
                             <i class="bi bi-plus" />
                           </button>
-                          <button class="btn btn-outline-dark btn-sm rounded-2 ms-2 p-0 px-1">
-                            <i class="bi bi-x" />
-                          </button>
+                          <span class="ms-2">
+                            <Modal
+                              triggerBIcon="x"
+                              triggerClass="btn-outline-dark btn-sm rounded-2 p-0 px-1"
+                              id="delete-column"
+                              headerText="Delete column"
+                              escapeClose
+                              bodyText="Are you sure you want to delete the column? All the fields in the column will be moved to the previous column"
+                            >
+                              <div q:slot="footer">
+                                <button class="btn btn-secondary btn-sm">
+                                  Delete entire column with fields
+                                </button>
+                                <button class="ms-2 btn btn-dark btn-sm">
+                                  Delete column
+                                </button>
+                              </div>
+                            </Modal>
+                          </span>
                         </div>
                       </>
                     ) : (

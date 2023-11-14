@@ -22,6 +22,9 @@ interface Props {
   deleteSectionWithColumns: QRL<(columnId: string) => {}>;
   deleteColumn: QRL<(columnId: string) => {}>;
   deleteSetion: QRL<(sectionId: string) => {}>;
+  moveColumn: QRL<
+    (columnId: string, parentSection: string, direction: "left" | "right") => {}
+  >;
 }
 
 export default component$<Props>(
@@ -41,6 +44,7 @@ export default component$<Props>(
     deleteSectionWithColumns,
     deleteColumn,
     deleteSetion,
+    moveColumn,
   }) => {
     useStyles$(`.hover-outline:hover{
     outline: 1px solid black;
@@ -189,9 +193,38 @@ export default component$<Props>(
                           </div>
                           <div class="col-auto">
                             {columnIndex > 0 && (
+                              <button class="btn btn-outline-dark btn-sm rounded-2 p-0 px-1">
+                                <i
+                                  class="bi bi-caret-left-fill"
+                                  onClick$={() =>
+                                    moveColumn(
+                                      column.id,
+                                      column.parentId!,
+                                      "left"
+                                    )
+                                  }
+                                ></i>
+                              </button>
+                            )}
+                            {columnIndex < section.childCount! - 1 && (
+                              <button
+                                class="btn btn-outline-dark btn-sm rounded-2 ms-2 p-0 px-1"
+                                onClick$={() =>
+                                  moveColumn(
+                                    column.id,
+                                    column.parentId!,
+                                    "right"
+                                  )
+                                }
+                              >
+                                <i class="bi bi-caret-right-fill"></i>
+                              </button>
+                            )}
+
+                            {columnIndex > 0 && (
                               <Tooltip title="Move current column and following columns to new section">
                                 <button
-                                  class="btn btn-outline-dark btn-sm rounded-2 p-0 px-1"
+                                  class="btn btn-outline-dark btn-sm ms-2 rounded-2 p-0 px-1"
                                   onClick$={() =>
                                     moveColumnsToNewSection(column.id)
                                   }

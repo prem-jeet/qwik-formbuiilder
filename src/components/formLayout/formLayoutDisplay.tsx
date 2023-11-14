@@ -199,7 +199,7 @@ export default component$<Props>(
                             >
                               <i class="bi bi-plus" />
                             </button>
-                            {section.childCount! > 1 && (
+                            {columnIndex > 0 && (
                               <span class="ms-2">
                                 <Modal
                                   triggerBIcon="x"
@@ -238,13 +238,12 @@ export default component$<Props>(
                         <div
                           role="button"
                           class={`
-                      ${
-                        selectedFieldId.value === field.id &&
-                        !isPreview.value &&
-                        "selected_field"
-                      } 
-                     
-                      mt-1  formBuilder_inputField p-2 rounded-3`}
+                                ${
+                                  selectedFieldId.value === field.id &&
+                                  !isPreview.value &&
+                                  "selected_field"
+                                } 
+                                mt-1  formBuilder_inputField p-2 rounded-3`}
                           key={field.id}
                           onClick$={async (e) => {
                             await clearSelections(e);

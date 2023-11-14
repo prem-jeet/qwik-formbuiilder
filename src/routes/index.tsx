@@ -54,6 +54,12 @@ export default component$(() => {
     })),
     fields: [],
   });
+
+  const selectedSectionId = useSignal("");
+  const selectedFieldId = useSignal("");
+  const selectedColmnId = useSignal(formLayout.columns[0].id);
+
+  // handle childCount
   const incrementChildCount = $((key: "sections" | "columns", id: string) => {
     const index = formLayout[key as keyof FormLayout].findIndex(
       (item: { id: string }) => item.id === id
@@ -71,10 +77,7 @@ export default component$(() => {
     }
   });
 
-  const selectedSectionId = useSignal("");
-  const selectedFieldId = useSignal("");
-  const selectedColmnId = useSignal(formLayout.columns[0].id);
-
+  // adding column or section
   const addColumnAfter = $((columnId: string) => {
     const columns = [...formLayout.columns];
     const columnIndex = columns.findIndex(({ id }) => id === columnId);
@@ -114,7 +117,7 @@ export default component$(() => {
     }
     return newSection.id;
   });
-
+  // Field related function
   const addInputField = $((newEntity: FormEntity) => {
     if (selectedColmnId.value)
       formLayout.fields.push({ ...newEntity, parentId: selectedColmnId.value });
@@ -197,6 +200,7 @@ export default component$(() => {
     }
   });
 
+  // deletion related function
   const deleteColumnWithFields = $((columnId: string) => {
     formLayout.fields = formLayout.fields.filter(
       (field) => field.parentId !== columnId
@@ -209,6 +213,7 @@ export default component$(() => {
       return true;
     });
   });
+
   const deleteSectionWithColumns = $((sectionId: string) => {
     formLayout.columns = formLayout.columns.filter((column) => {
       if (column.parentId === sectionId) {
@@ -222,6 +227,7 @@ export default component$(() => {
       (section) => section.id !== sectionId
     );
   });
+
   return (
     <>
       <div class="vw-100 vh-100">

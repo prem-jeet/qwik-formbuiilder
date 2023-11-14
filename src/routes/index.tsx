@@ -157,13 +157,14 @@ export default component$(() => {
       const newColumnId = await addColumnAfter(parentColumnId);
       if (newColumnId) {
         formLayout.fields = formLayout.fields.map((field, index) => {
-          if (index < fieldIndex) {
+          if (index < fieldIndex || field.parentId !== parentColumnId) {
             return field;
+          } else {
+            return {
+              ...field,
+              parentId: newColumnId,
+            };
           }
-          return {
-            ...field,
-            parentId: newColumnId,
-          };
         });
       }
     }

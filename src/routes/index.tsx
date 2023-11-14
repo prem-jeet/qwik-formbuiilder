@@ -214,6 +214,35 @@ export default component$(() => {
     });
   });
 
+  const deleteColumn = $((columnId: string) => {
+    const currentColumnIndex = formLayout.columns.findIndex(
+      (column) => column.id === columnId
+    );
+    if (currentColumnIndex) {
+      const currentColumn = formLayout.columns[currentColumnIndex];
+
+      const previousColumn = formLayout.columns
+        .slice(0, currentColumnIndex)
+        .filter((column) => column.parentId === currentColumn.parentId)
+        .slice(-1)[0];
+
+      decrementChildCount("sections", currentColumn.parentId!);
+      formLayout.fields = formLayout.fields.map((field) => {
+        if (field.parentId !== currentColumn.id) {
+          return field;
+        }
+        return {
+          ...field,
+          parentId: previousColumn.id,
+        };
+      });
+      formLayout.columns = [
+        ...formLayout.columns.slice(0, currentColumnIndex),
+        ...formLayout.columns.slice(currentColumnIndex + 1),
+      ];
+    }
+  });
+
   const deleteSectionWithColumns = $((sectionId: string) => {
     formLayout.columns = formLayout.columns.filter((column) => {
       if (column.parentId === sectionId) {
@@ -292,6 +321,7 @@ export default component$(() => {
                     duplicateField={duplicateField}
                     deleteColumnWithFields={deleteColumnWithFields}
                     deleteSectionWithColumns={deleteSectionWithColumns}
+                    deleteColumn={deleteColumn}
                   />
                 </div>
               </div>

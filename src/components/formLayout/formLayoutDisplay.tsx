@@ -21,6 +21,7 @@ interface Props {
   deleteColumnWithFields: QRL<(columnId: string) => {}>;
   deleteSectionWithColumns: QRL<(columnId: string) => {}>;
   deleteColumn: QRL<(columnId: string) => {}>;
+  deleteSetion: QRL<(sectionId: string) => {}>;
 }
 
 export default component$<Props>(
@@ -39,6 +40,7 @@ export default component$<Props>(
     deleteColumnWithFields,
     deleteSectionWithColumns,
     deleteColumn,
+    deleteSetion,
   }) => {
     useStyles$(`.hover-outline:hover{
     outline: 1px solid black;
@@ -135,7 +137,10 @@ export default component$<Props>(
                           >
                             Delete entire section with columns
                           </button>
-                          <button class="ms-2 btn btn-dark btn-sm">
+                          <button
+                            class="ms-2 btn btn-dark btn-sm"
+                            onClick$={() => deleteSetion(section.id)}
+                          >
                             Delete section
                           </button>
                         </div>

@@ -256,6 +256,34 @@ export default component$(() => {
       (section) => section.id !== sectionId
     );
   });
+  const removeFromIndex = $((arr: any[], index: number): unknown[] => {
+    if (index < 0 || index > arr.length - 1) {
+      return [...arr];
+    }
+    return [...arr.slice(0, index), ...arr.slice(index + 1)];
+  });
+  const deleteSetion = $(async (sectionId: string) => {
+    const currentSectionIndex = formLayout.sections.findIndex(
+      (section) => sectionId === section.id
+    );
+    const previousSection = formLayout.sections
+      .slice(0, currentSectionIndex)
+      .slice(-1)[0];
+    formLayout.columns = formLayout.columns.map((column) => {
+      if (column.parentId === sectionId) {
+        incrementChildCount("sections", previousSection.id);
+      }
+      return {
+        ...column,
+        parentId:
+          column.parentId === sectionId ? previousSection.id : column.parentId,
+      };
+    });
+    formLayout.sections = (await removeFromIndex(
+      formLayout.sections,
+      currentSectionIndex
+    )) as FormEntity[];
+  });
 
   return (
     <>
@@ -322,6 +350,7 @@ export default component$(() => {
                     deleteColumnWithFields={deleteColumnWithFields}
                     deleteSectionWithColumns={deleteSectionWithColumns}
                     deleteColumn={deleteColumn}
+                    deleteSetion={deleteSetion}
                   />
                 </div>
               </div>

@@ -13,10 +13,11 @@ interface Props {
   selectedSectionId: Signal<string>;
   selectedFieldId: Signal<string>;
   addColumnAfter: QRL<(columnId: string) => {}>;
-  addSectionAfter: QRL<(sectionId: string) => {}>;
+  addSectionAfter: QRL<(sectionId?: string, addColumns?: boolean) => string>;
   removeField: QRL<(fieldId: string) => {}>;
   duplicateField: QRL<(fieldId: string) => {}>;
   moveFieldsToNewColumn: QRL<(fieldId: string) => {}>;
+  moveColumnsToNewSection: QRL<(columnId: string) => {}>;
   deleteColumnWithFields: QRL<(columnId: string) => {}>;
   deleteSectionWithColumns: QRL<(columnId: string) => {}>;
 }
@@ -33,6 +34,7 @@ export default component$<Props>(
     removeField,
     duplicateField,
     moveFieldsToNewColumn,
+    moveColumnsToNewSection,
     deleteColumnWithFields,
     deleteSectionWithColumns,
   }) => {
@@ -108,7 +110,7 @@ export default component$<Props>(
                 <div class="col-auto">
                   <button
                     class="btn btn-outline-dark btn-sm rounded-2 p-0 px-1"
-                    onClick$={() => addSectionAfter(section.id)}
+                    onClick$={() => addSectionAfter(section.id, true)}
                   >
                     <i class="bi bi-plus" />
                   </button>
@@ -181,7 +183,12 @@ export default component$<Props>(
                           <div class="col-auto">
                             {columnIndex > 0 && (
                               <Tooltip title="Move current column and following columns to new section">
-                                <button class="btn btn-outline-dark btn-sm rounded-2 p-0 px-1">
+                                <button
+                                  class="btn btn-outline-dark btn-sm rounded-2 p-0 px-1"
+                                  onClick$={() =>
+                                    moveColumnsToNewSection(column.id)
+                                  }
+                                >
                                   <i class="bi bi-box-arrow-in-up-right" />
                                 </button>
                               </Tooltip>

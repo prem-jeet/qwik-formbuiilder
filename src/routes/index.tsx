@@ -93,7 +93,7 @@ export default component$(() => {
     }
   });
 
-  const addSectionAfter = $((sectionId?: string) => {
+  const addSectionAfter = $((sectionId?: string, addColumns?: boolean) => {
     const sections = [...formLayout.sections];
     const sectionIndex = sections.findIndex(({ id }) => id === sectionId);
 
@@ -105,12 +105,16 @@ export default component$(() => {
       { ...newSection },
       ...sections.slice(sectionIndex + 1),
     ];
-    for (let i = 0; i < 2; i++) {
-      const newColumn = createEntity("column");
-      newColumn.parentId = newSection.id;
-      formLayout.columns.push({ ...newColumn });
+    if (addColumns) {
+      for (let i = 0; i < 2; i++) {
+        const newColumn = createEntity("column");
+        newColumn.parentId = newSection.id;
+        formLayout.columns.push({ ...newColumn });
+      }
     }
+    return newSection.id;
   });
+
   const addInputField = $((newEntity: FormEntity) => {
     if (selectedColmnId.value)
       formLayout.fields.push({ ...newEntity, parentId: selectedColmnId.value });
@@ -170,6 +174,29 @@ export default component$(() => {
     }
   });
 
+  const moveColumnsToNewSection = $(async (startingcolumnId: string) => {
+    selectedColmnId.value = "";
+    const columnIndex = formLayout.columns.findIndex(
+      (column) => column.id === startingcolumnId
+    );
+    const parentSectionId = formLayout.columns[columnIndex].parentId;
+
+    if (parentSectionId) {
+      const newSectionId = await addSectionAfter(parentSectionId, false);
+      formLayout.columns = formLayout.columns.map((column, index) => {
+        if (index < columnIndex || column.parentId !== parentSectionId) {
+          return column;
+        } else {
+          decrementChildCount("sections", parentSectionId);
+          return {
+            ...column,
+            parentId: newSectionId,
+          };
+        }
+      });
+    }
+  });
+
   const deleteColumnWithFields = $((columnId: string) => {
     formLayout.fields = formLayout.fields.filter(
       (field) => field.parentId !== columnId
@@ -197,7 +224,7 @@ export default component$(() => {
   });
   return (
     <>
-      <div class="vw-100 vh-100 overflow-hidden">
+      <div class="vw-100 vh-100">
         <div class="container-fluid">
           <div class="row px-4 py-5 vh-100 justify-content-between ">
             <div class="col-2">
@@ -255,6 +282,7 @@ export default component$(() => {
                     selectedFieldId={selectedFieldId}
                     removeField={removeField}
                     moveFieldsToNewColumn={moveFieldsToNewColumn}
+                    moveColumnsToNewSection={moveColumnsToNewSection}
                     duplicateField={duplicateField}
                     deleteColumnWithFields={deleteColumnWithFields}
                     deleteSectionWithColumns={deleteSectionWithColumns}

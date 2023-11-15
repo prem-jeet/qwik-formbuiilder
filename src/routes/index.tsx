@@ -1,5 +1,5 @@
 import type { AvailableInputTypes } from "~/components/available-fields-menu/availableFieldMenu";
-import { $, component$, useSignal, useStore } from "@builder.io/qwik";
+import { $, component$, useSignal, useStore, useTask$ } from "@builder.io/qwik";
 import AvailableFieldMenu from "~/components/available-fields-menu/availableFieldMenu";
 import FormLayoutDisplay from "~/components/formLayout/formLayoutDisplay";
 export interface FormEntity {
@@ -58,6 +58,13 @@ export default component$(() => {
   const selectedSectionId = useSignal("");
   const selectedFieldId = useSignal("");
   const selectedColmnId = useSignal(formLayout.columns[0].id);
+
+  useTask$(({ track }) => {
+    track(() => isPreview.value);
+    selectedSectionId.value = "";
+    selectedColmnId.value = "";
+    selectedFieldId.value = "";
+  });
 
   // handle childCount
   const incrementChildCount = $((key: "sections" | "columns", id: string) => {
@@ -318,6 +325,27 @@ export default component$(() => {
       }
     }
   );
+
+  const moveSection = $((sectionId: string, direction: "up" | "down") => {
+    const sectionIndex = formLayout.sections.findIndex(
+      (section) => section.id === sectionId
+    );
+    if (direction === "down") {
+      const nextSection = formLayout.sections[sectionIndex + 1];
+      formLayout.sections[sectionIndex + 1] = {
+        ...formLayout.sections[sectionIndex],
+      };
+      formLayout.sections[sectionIndex] = { ...nextSection };
+    }
+    if (direction === "up") {
+      const previousSection = formLayout.sections[sectionIndex - 1];
+      formLayout.sections[sectionIndex - 1] = {
+        ...formLayout.sections[sectionIndex],
+      };
+
+      formLayout.sections[sectionIndex] = { ...previousSection };
+    }
+  });
   return (
     <>
       <div class="vw-100 vh-100">
@@ -385,6 +413,7 @@ export default component$(() => {
                     deleteColumn={deleteColumn}
                     deleteSetion={deleteSetion}
                     moveColumn={moveColumn}
+                    moveSection={moveSection}
                   />
                 </div>
               </div>

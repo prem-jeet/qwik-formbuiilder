@@ -25,6 +25,7 @@ interface Props {
   moveColumn: QRL<
     (columnId: string, parentSection: string, direction: "left" | "right") => {}
   >;
+  moveSection: QRL<(sectionId: string, direction: "up" | "down") => {}>;
 }
 
 export default component$<Props>(
@@ -45,6 +46,7 @@ export default component$<Props>(
     deleteColumn,
     deleteSetion,
     moveColumn,
+    moveSection,
   }) => {
     useStyles$(`.hover-outline:hover{
     outline: 1px solid black;
@@ -89,7 +91,7 @@ export default component$<Props>(
 
     return (
       <>
-        {formLayout.sections.map(async (section) => (
+        {formLayout.sections.map(async (section, sectionIndex) => (
           <section
             role="button"
             class={`
@@ -116,8 +118,24 @@ export default component$<Props>(
                   {section.label || "(no label)"}
                 </div>
                 <div class="col-auto">
+                  {sectionIndex > 0 && (
+                    <button
+                      class="btn btn-outline-dark btn-sm rounded-2 p-0 px-1"
+                      onClick$={() => moveSection(section.id, "up")}
+                    >
+                      <i class="bi bi-caret-up-fill"></i>
+                    </button>
+                  )}
+                  {sectionIndex < formLayout.sections.length - 1 && (
+                    <button
+                      class="btn btn-outline-dark btn-sm rounded-2 ms-2 p-0 px-1"
+                      onClick$={() => moveSection(section.id, "down")}
+                    >
+                      <i class="bi bi-caret-down-fill"></i>
+                    </button>
+                  )}
                   <button
-                    class="btn btn-outline-dark btn-sm rounded-2 p-0 px-1"
+                    class="btn btn-outline-dark btn-sm rounded-2 ms-2 p-0 px-1"
                     onClick$={() => addSectionAfter(section.id, true)}
                   >
                     <i class="bi bi-plus" />

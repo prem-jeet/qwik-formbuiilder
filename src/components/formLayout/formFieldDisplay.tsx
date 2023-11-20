@@ -10,7 +10,10 @@ interface Props {
   duplicateField: QRL<(fieldId: string) => {}>;
   moveFieldsToNewColumn: QRL<(fieldId: string) => {}>;
   shouldAllowDetach: boolean;
+  shouldShowUpButton: boolean;
+  shouldShowDownButton: boolean;
   isPreview: Signal<boolean>;
+  moveField: QRL<(fieldId: string, direction: "up" | "down") => {}>;
 }
 
 export default component$<Props>(
@@ -22,6 +25,9 @@ export default component$<Props>(
     moveFieldsToNewColumn,
     shouldAllowDetach,
     isPreview,
+    shouldShowDownButton,
+    shouldShowUpButton,
+    moveField,
   }) => {
     useStylesScoped$(`
   .form-field:hover{
@@ -88,14 +94,34 @@ export default component$<Props>(
             <div
               class={`${fieldEntity.type === "checkbox" && "ms-auto"} col-auto`}
             >
+              {shouldShowUpButton && (
+                <button
+                  class="btn btn-outline-dark p-0 px-1"
+                  onClick$={() => moveField(fieldEntity.id, "up")}
+                >
+                  <i class="bi bi-caret-up-fill"></i>
+                </button>
+              )}
+              {shouldShowDownButton && (
+                <span class="ms-2">
+                  <button
+                    class="btn btn-outline-dark p-0 px-1"
+                    onClick$={() => moveField(fieldEntity.id, "down")}
+                  >
+                    <i class="bi bi-caret-down-fill"></i>
+                  </button>
+                </span>
+              )}
               {shouldAllowDetach && (
-                <TooltipButton
-                  buttonClass=" btn-outline-dark p-0 px-1"
-                  size="sm"
-                  tootlipText="Move current field and following fields to new column"
-                  bootstrapIconName="box-arrow-in-up-right"
-                  onClick={$(() => moveFieldsToNewColumn(fieldEntity.id))}
-                />
+                <span class="ms-2">
+                  <TooltipButton
+                    buttonClass=" btn-outline-dark p-0 px-1"
+                    size="sm"
+                    tootlipText="Move current field and following fields to new column"
+                    bootstrapIconName="box-arrow-in-up-right"
+                    onClick={$(() => moveFieldsToNewColumn(fieldEntity.id))}
+                  />
+                </span>
               )}
               <span class="ms-2">
                 <TooltipButton

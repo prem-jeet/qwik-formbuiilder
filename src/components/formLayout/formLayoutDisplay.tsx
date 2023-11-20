@@ -89,6 +89,38 @@ export default component$<Props>(
       selectedFieldId.value = "";
     });
 
+    const moveField = $((fieldId: string, direction: "up" | "down") => {
+      const fieldIndex = formLayout.fields.findIndex(
+        (field) => field.id === fieldId
+      );
+
+      if (fieldIndex >= 0) {
+        const targetField = { ...formLayout.fields[fieldIndex] };
+        const filteredFields = formLayout.fields.filter(
+          (field) => field.parentId === targetField.parentId
+        );
+        const filteredIndex = filteredFields.findIndex(
+          (field) => fieldId === field.id
+        );
+        if (direction === "up") {
+          const previousField = { ...filteredFields[filteredIndex - 1] };
+          const previousFieldIndex = formLayout.fields.findIndex(
+            (field) => field.id === previousField.id
+          );
+          formLayout.fields[previousFieldIndex] = { ...targetField };
+          formLayout.fields[fieldIndex] = { ...previousField };
+        }
+        if (direction === "down") {
+          const nextField = { ...filteredFields[filteredIndex + 1] };
+          const nextFieldIndex = formLayout.fields.findIndex(
+            (field) => field.id === nextField.id
+          );
+          formLayout.fields[nextFieldIndex] = { ...targetField };
+          formLayout.fields[fieldIndex] = { ...nextField };
+        }
+      }
+    });
+
     return (
       <>
         {formLayout.sections.map(async (section, sectionIndex) => (
@@ -319,6 +351,12 @@ export default component$<Props>(
                             shouldAllowDetach={index > 0}
                             isPreview={isPreview}
                             duplicateField={duplicateField}
+                            shouldShowUpButton={index > 0}
+                            shouldShowDownButton={
+                              index <
+                              filterById(formLayout.fields, column.id).length
+                            }
+                            moveField={moveField}
                           />
                         </div>
                       )

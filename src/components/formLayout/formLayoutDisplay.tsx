@@ -89,35 +89,29 @@ export default component$<Props>(
       selectedFieldId.value = "";
     });
 
-    const moveField = $((fieldId: string, direction: "up" | "down") => {
-      const fieldIndex = formLayout.fields.findIndex(
-        (field) => field.id === fieldId
+    const moveField = $((currentFieldId: string, direction: "up" | "down") => {
+      const currentFieldIndex = formLayout.fields.findIndex(
+        (field) => field.id === currentFieldId
       );
 
-      if (fieldIndex >= 0) {
-        const targetField = { ...formLayout.fields[fieldIndex] };
+      if (currentFieldIndex >= 0) {
+        const currentField = { ...formLayout.fields[currentFieldIndex] };
         const filteredFields = formLayout.fields.filter(
-          (field) => field.parentId === targetField.parentId
+          (field) => field.parentId === currentField.parentId
         );
-        const filteredIndex = filteredFields.findIndex(
-          (field) => fieldId === field.id
+        const currentfieldOrder = filteredFields.findIndex(
+          (field) => currentFieldId === field.id
         );
-        if (direction === "up") {
-          const previousField = { ...filteredFields[filteredIndex - 1] };
-          const previousFieldIndex = formLayout.fields.findIndex(
-            (field) => field.id === previousField.id
-          );
-          formLayout.fields[previousFieldIndex] = { ...targetField };
-          formLayout.fields[fieldIndex] = { ...previousField };
-        }
-        if (direction === "down") {
-          const nextField = { ...filteredFields[filteredIndex + 1] };
-          const nextFieldIndex = formLayout.fields.findIndex(
-            (field) => field.id === nextField.id
-          );
-          formLayout.fields[nextFieldIndex] = { ...targetField };
-          formLayout.fields[fieldIndex] = { ...nextField };
-        }
+
+        const swapWith = {
+          ...filteredFields[currentfieldOrder + (direction === "up" ? -1 : 1)],
+        };
+        const swapIndex = formLayout.fields.findIndex(
+          (field) => field.id === swapWith.id
+        );
+
+        formLayout.fields[swapIndex] = { ...currentField };
+        formLayout.fields[currentFieldIndex] = { ...swapWith };
       }
     });
 

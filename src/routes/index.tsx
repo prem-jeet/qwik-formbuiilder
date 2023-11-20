@@ -28,19 +28,14 @@ export interface FormLayout {
 const createEntity = (
   type: AvailableInputTypes | "column" | "section",
   parentId?: string
-) => {
-  const newEntity: FormEntity = {
-    id: (() => crypto.randomUUID())(),
-    type: type,
-    label: null,
-    name: null,
-    parentId: parentId || null,
-  };
-  if (type === "section") {
-    newEntity.childCount = 0;
-  }
-  return newEntity;
-};
+) => ({
+  id: (() => crypto.randomUUID())(),
+  type: type,
+  label: null,
+  name: null,
+  parentId: parentId || null,
+  childCount: 0,
+});
 
 export default component$(() => {
   const isPreview = useSignal(false);

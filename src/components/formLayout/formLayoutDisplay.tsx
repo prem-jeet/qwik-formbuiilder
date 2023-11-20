@@ -22,11 +22,10 @@ interface Props {
   deleteSectionWithColumns: QRL<(columnId: string) => {}>;
   deleteColumn: QRL<(columnId: string) => {}>;
   deleteSetion: QRL<(sectionId: string) => {}>;
-  moveColumn: QRL<
-    (columnId: string, parentSection: string, direction: "left" | "right") => {}
-  >;
-  moveSection: QRL<(sectionId: string, direction: "up" | "down") => {}>;
 }
+
+const filterById = (array: FormEntity[], id: string) =>
+  array.filter(({ parentId }) => parentId === id);
 
 export default component$<Props>(
   ({
@@ -45,8 +44,6 @@ export default component$<Props>(
     deleteSectionWithColumns,
     deleteColumn,
     deleteSetion,
-    moveColumn,
-    moveSection,
   }) => {
     useStyles$(`.hover-outline:hover{
     outline: 1px solid black;
@@ -79,9 +76,6 @@ export default component$<Props>(
       })
     );
 
-    const filterById = (array: FormEntity[], id: string) =>
-      array.filter(({ parentId }) => parentId === id);
-
     const clearSelections = $((e: QwikMouseEvent) => {
       e.stopPropagation();
       selectedColmnId.value = "";
@@ -89,31 +83,50 @@ export default component$<Props>(
       selectedFieldId.value = "";
     });
 
-    const moveField = $((currentFieldId: string, direction: "up" | "down") => {
-      const currentFieldIndex = formLayout.fields.findIndex(
-        (field) => field.id === currentFieldId
-      );
-
-      if (currentFieldIndex >= 0) {
-        const currentField = { ...formLayout.fields[currentFieldIndex] };
-        const filteredFields = formLayout.fields.filter(
-          (field) => field.parentId === currentField.parentId
+    const moveSection = $(
+      (currentSectionId: string, direction: "up" | "down") => {
+        const currentSectionIndex = formLayout.sections.findIndex(
+          (section) => section.id === currentSectionId
         );
-        const currentfieldOrder = filteredFields.findIndex(
-          (field) => currentFieldId === field.id
-        );
-
-        const swapWith = {
-          ...filteredFields[currentfieldOrder + (direction === "up" ? -1 : 1)],
-        };
-        const swapIndex = formLayout.fields.findIndex(
-          (field) => field.id === swapWith.id
-        );
-
-        formLayout.fields[swapIndex] = { ...currentField };
-        formLayout.fields[currentFieldIndex] = { ...swapWith };
+        if (currentSectionIndex >= 0) {
+          const swapIndex = currentSectionIndex + (direction === "up" ? -1 : 1);
+          const swapWith = { ...formLayout.sections[swapIndex] };
+          formLayout.sections[swapIndex] = {
+            ...formLayout.sections[currentSectionIndex],
+          };
+          formLayout.sections[currentSectionIndex] = { ...swapWith };
+        }
       }
-    });
+    );
+
+    const moveWithinParentContainer = $(
+      (
+        entityType: "column" | "field",
+        direction: "up" | "down",
+        targetId: string
+      ) => {
+        const key = entityType === "column" ? "columns" : "fields";
+
+        const targetIndex = formLayout[key].findIndex((e) => e.id === targetId);
+        if (targetIndex >= 0) {
+          const target = { ...formLayout[key][targetIndex] };
+          const filteredArray = formLayout[key].filter(
+            (e) => e.parentId === target.parentId
+          );
+          const targetorder = filteredArray.findIndex((e) => targetId === e.id);
+
+          const swapWith = {
+            ...filteredArray[targetorder + (direction === "up" ? -1 : 1)],
+          };
+          const swapIndex = formLayout[key].findIndex(
+            (e) => e.id === swapWith.id
+          );
+
+          formLayout[key][swapIndex] = { ...target };
+          formLayout[key][targetIndex] = { ...swapWith };
+        }
+      }
+    );
 
     return (
       <>
@@ -241,10 +254,10 @@ export default component$<Props>(
                                 <i
                                   class="bi bi-caret-left-fill"
                                   onClick$={() =>
-                                    moveColumn(
-                                      column.id,
-                                      column.parentId!,
-                                      "left"
+                                    moveWithinParentContainer(
+                                      "column",
+                                      "up",
+                                      column.id
                                     )
                                   }
                                 ></i>
@@ -254,10 +267,10 @@ export default component$<Props>(
                               <button
                                 class="btn btn-outline-dark btn-sm rounded-2 ms-2 p-0 px-1"
                                 onClick$={() =>
-                                  moveColumn(
-                                    column.id,
-                                    column.parentId!,
-                                    "right"
+                                  moveWithinParentContainer(
+                                    "column",
+                                    "down",
+                                    column.id
                                   )
                                 }
                               >
@@ -352,7 +365,15 @@ export default component$<Props>(
                               index <
                               filterById(formLayout.fields, column.id).length
                             }
-                            moveField={moveField}
+                            moveField={$(
+                              (id: string, direction: "up" | "down") => {
+                                moveWithinParentContainer(
+                                  "field",
+                                  direction,
+                                  id
+                                );
+                              }
+                            )}
                           />
                         </div>
                       )

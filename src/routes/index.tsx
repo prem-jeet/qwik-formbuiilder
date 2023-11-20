@@ -312,61 +312,6 @@ export default component$(() => {
     )) as FormEntity[];
   });
 
-  // movement within container
-  const moveColumn = $(
-    (columnId: string, sectionId: string, direction: "left" | "right") => {
-      const columns = formLayout.columns.filter(
-        (column) => column.parentId === sectionId
-      );
-      const tempIndex = columns.findIndex((column) => column.id === columnId);
-      const actualIndex = formLayout.columns.findIndex(
-        (column) => column.id === columnId
-      );
-      const nextColumn = columns[tempIndex + 1];
-      const previousColumn = columns[tempIndex - 1];
-
-      if (direction === "right") {
-        const nextColumnIndex = formLayout.columns.findIndex(
-          (column) => column.id === nextColumn.id
-        );
-        formLayout.columns[nextColumnIndex] = {
-          ...formLayout.columns[actualIndex],
-        };
-        formLayout.columns[actualIndex] = { ...nextColumn };
-      }
-      if (direction === "left") {
-        const previousColumnIndex = formLayout.columns.findIndex(
-          (column) => column.id === previousColumn.id
-        );
-        formLayout.columns[previousColumnIndex] = {
-          ...formLayout.columns[actualIndex],
-        };
-        formLayout.columns[actualIndex] = { ...previousColumn };
-      }
-    }
-  );
-
-  const moveSection = $((sectionId: string, direction: "up" | "down") => {
-    const sectionIndex = formLayout.sections.findIndex(
-      (section) => section.id === sectionId
-    );
-    if (direction === "down") {
-      const nextSection = formLayout.sections[sectionIndex + 1];
-      formLayout.sections[sectionIndex + 1] = {
-        ...formLayout.sections[sectionIndex],
-      };
-      formLayout.sections[sectionIndex] = { ...nextSection };
-    }
-    if (direction === "up") {
-      const previousSection = formLayout.sections[sectionIndex - 1];
-      formLayout.sections[sectionIndex - 1] = {
-        ...formLayout.sections[sectionIndex],
-      };
-
-      formLayout.sections[sectionIndex] = { ...previousSection };
-    }
-  });
-
   return (
     <>
       <div class="vw-100 vh-100">
@@ -433,8 +378,6 @@ export default component$(() => {
                     deleteSectionWithColumns={deleteSectionWithColumns}
                     deleteColumn={deleteColumn}
                     deleteSetion={deleteSetion}
-                    moveColumn={moveColumn}
-                    moveSection={moveSection}
                   />
                 </div>
               </div>

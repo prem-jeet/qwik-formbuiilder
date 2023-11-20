@@ -4,7 +4,7 @@ import { $, component$, useOn, useSignal, useStyles$ } from "@builder.io/qwik";
 import type { FormEntity, FormLayout } from "~/routes";
 import FormFieldDisplay from "./formFieldDisplay";
 import Modal from "../modals/modal";
-import Tooltip from "../tooltip";
+import TooltipButton from "../buttons/tooltipButton";
 
 interface Props {
   formLayout: FormLayout;
@@ -272,17 +272,19 @@ export default component$<Props>(
                             )}
 
                             {columnIndex > 0 && (
-                              <Tooltip title="Move current column and following columns to new section">
-                                <button
-                                  class="btn btn-outline-dark btn-sm ms-2 rounded-2 p-0 px-1"
-                                  onClick$={() =>
+                              <span class="ms-2">
+                                <TooltipButton
+                                  buttonClass=" btn-outline-dark p-0 px-1"
+                                  size="sm"
+                                  tootlipText="Move current column and following columns to new section"
+                                  bootstrapIconName="box-arrow-in-up-right"
+                                  onClick={$(() =>
                                     moveColumnsToNewSection(column.id)
-                                  }
-                                >
-                                  <i class="bi bi-box-arrow-in-up-right" />
-                                </button>
-                              </Tooltip>
+                                  )}
+                                />
+                              </span>
                             )}
+
                             <button
                               class="btn btn-outline-dark btn-sm rounded-2 ms-2 p-0 px-1"
                               onClick$={() => addColumnAfter(column.id)}

@@ -21,13 +21,19 @@ export interface FormLayout {
 const createEntity = (
   type: AvailableInputTypes | "column" | "section",
   parentId?: string
-) => ({
-  id: (() => crypto.randomUUID())(),
-  type: type,
-  label: null,
-  name: null,
-  parentId: parentId || null,
-});
+) => {
+  const newEntity: FormEntity = {
+    id: (() => crypto.randomUUID())(),
+    type: type,
+    label: null,
+    name: null,
+    parentId: parentId || null,
+  };
+  if (type === "section") {
+    newEntity.childCount = 0;
+  }
+  return newEntity;
+};
 
 export default component$(() => {
   const isPreview = useSignal(false);
@@ -103,27 +109,31 @@ export default component$(() => {
     }
   });
 
-  const addSectionAfter = $((sectionId?: string, addColumns?: boolean) => {
-    const sections = [...formLayout.sections];
-    const sectionIndex = sections.findIndex(({ id }) => id === sectionId);
+  const addSectionAfter = $(
+    async (sectionId?: string, addColumns?: boolean) => {
+      const sections = [...formLayout.sections];
+      const sectionIndex = sections.findIndex(({ id }) => id === sectionId);
 
-    const newSection = createEntity("section");
-    newSection.parentId = null;
+      const newSection = createEntity("section");
+      newSection.parentId = null;
 
-    formLayout.sections = [
-      ...sections.slice(0, sectionIndex + 1),
-      { ...newSection },
-      ...sections.slice(sectionIndex + 1),
-    ];
-    if (addColumns) {
-      for (let i = 0; i < 2; i++) {
-        const newColumn = createEntity("column");
-        newColumn.parentId = newSection.id;
-        formLayout.columns.push({ ...newColumn });
+      formLayout.sections = [
+        ...sections.slice(0, sectionIndex + 1),
+        { ...newSection },
+        ...sections.slice(sectionIndex + 1),
+      ];
+      if (addColumns) {
+        for (let i = 0; i < 2; i++) {
+          const newColumn = createEntity("column");
+          newColumn.parentId = newSection.id;
+          formLayout.columns.push({ ...newColumn });
+          await incrementChildCount("sections", newSection.id);
+        }
       }
+      return newSection.id;
     }
-    return newSection.id;
-  });
+  );
+
   // Field related function
   const addInputField = $((newEntity: FormEntity) => {
     if (selectedColmnId.value)
@@ -198,6 +208,7 @@ export default component$(() => {
           return column;
         } else {
           decrementChildCount("sections", parentSectionId);
+          incrementChildCount("sections", newSectionId);
           return {
             ...column,
             parentId: newSectionId,

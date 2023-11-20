@@ -1,5 +1,12 @@
 import type { AvailableInputTypes } from "~/components/available-fields-menu/availableFieldMenu";
-import { $, component$, useSignal, useStore, useTask$ } from "@builder.io/qwik";
+import {
+  $,
+  component$,
+  useSignal,
+  useStore,
+  useTask$,
+  useVisibleTask$,
+} from "@builder.io/qwik";
 import AvailableFieldMenu from "~/components/available-fields-menu/availableFieldMenu";
 import FormLayoutDisplay from "~/components/formLayout/formLayoutDisplay";
 export interface FormEntity {
@@ -63,13 +70,17 @@ export default component$(() => {
 
   const selectedSectionId = useSignal("");
   const selectedFieldId = useSignal("");
-  const selectedColmnId = useSignal(formLayout.columns[0].id);
+  const selectedColmnId = useSignal("");
 
   useTask$(({ track }) => {
     track(() => isPreview.value);
     selectedSectionId.value = "";
     selectedColmnId.value = "";
     selectedFieldId.value = "";
+  });
+
+  useVisibleTask$(() => {
+    selectedColmnId.value = formLayout.columns[0].id;
   });
 
   // handle childCount
@@ -136,8 +147,11 @@ export default component$(() => {
 
   // Field related function
   const addInputField = $((newEntity: FormEntity) => {
-    if (selectedColmnId.value)
+    if (selectedColmnId.value) {
       formLayout.fields.push({ ...newEntity, parentId: selectedColmnId.value });
+    } else {
+      alert("Select a column");
+    }
   });
 
   const removeField = $((fieldId: string) => {
@@ -357,6 +371,7 @@ export default component$(() => {
       formLayout.sections[sectionIndex] = { ...previousSection };
     }
   });
+
   return (
     <>
       <div class="vw-100 vh-100">

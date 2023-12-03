@@ -41,6 +41,7 @@ export default component$(() => {
   const isPreview = useSignal(false);
   const menuState = useSignal<"add" | "edit">("add");
   const initailId = (() => crypto.randomUUID())();
+  const editEntityId = useSignal("");
 
   const formLayout = useStore<FormLayout>({
     sections: [
@@ -67,15 +68,26 @@ export default component$(() => {
   const selectedFieldId = useSignal("");
   const selectedColmnId = useSignal("");
 
-  useTask$(({ track }) => {
-    track(() => isPreview.value);
+  const clearSelections = $(() => {
     selectedSectionId.value = "";
     selectedColmnId.value = "";
     selectedFieldId.value = "";
   });
 
+  useTask$(({ track }) => {
+    track(() => isPreview.value);
+    clearSelections();
+  });
+
   useVisibleTask$(() => {
     selectedColmnId.value = formLayout.columns[0].id;
+  });
+
+  useTask$(({ track }) => {
+    track(() => editEntityId.value);
+    if (editEntityId.value) {
+      menuState.value = "edit";
+    }
   });
 
   // handle childCount
@@ -346,7 +358,7 @@ export default component$(() => {
                 {menuState.value === "add" ? (
                   <AvailableFieldMenu addInputField={addInputField} />
                 ) : (
-                  <>edit field</>
+                  <>{editEntityId.value}</>
                 )}
               </div>
             </div>
@@ -378,6 +390,7 @@ export default component$(() => {
                     deleteSectionWithColumns={deleteSectionWithColumns}
                     deleteColumn={deleteColumn}
                     deleteSetion={deleteSetion}
+                    editEntityId={editEntityId}
                   />
                 </div>
               </div>

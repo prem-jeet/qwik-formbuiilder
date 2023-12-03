@@ -12,6 +12,7 @@ interface Props {
   selectedColmnId: Signal<string>;
   selectedSectionId: Signal<string>;
   selectedFieldId: Signal<string>;
+  editEntityId: Signal<string>;
   addColumnAfter: QRL<(columnId: string) => {}>;
   addSectionAfter: QRL<(sectionId?: string, addColumns?: boolean) => string>;
   removeField: QRL<(fieldId: string) => {}>;
@@ -44,6 +45,7 @@ export default component$<Props>(
     deleteSectionWithColumns,
     deleteColumn,
     deleteSetion,
+    editEntityId,
   }) => {
     useStyles$(`.hover-outline:hover{
     outline: 1px solid black;
@@ -356,6 +358,7 @@ export default component$<Props>(
                             fieldEntity={field}
                             selectedFieldId={selectedFieldId}
                             removeField={removeField}
+                            editEntityId={editEntityId}
                             moveFieldsToNewColumn={moveFieldsToNewColumn}
                             shouldAllowDetach={index > 0}
                             isPreview={isPreview}

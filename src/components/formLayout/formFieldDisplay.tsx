@@ -14,6 +14,7 @@ interface Props {
   shouldShowDownButton: boolean;
   isPreview: Signal<boolean>;
   moveField: QRL<(fieldId: string, direction: "up" | "down") => {}>;
+  editEntityId: Signal<string>;
 }
 
 export default component$<Props>(
@@ -28,6 +29,7 @@ export default component$<Props>(
     shouldShowDownButton,
     shouldShowUpButton,
     moveField,
+    editEntityId,
   }) => {
     useStylesScoped$(`
   .form-field:hover{
@@ -123,6 +125,7 @@ export default component$<Props>(
                   />
                 </span>
               )}
+
               <span class="ms-2">
                 <TooltipButton
                   buttonClass="btn-outline-dark p-0 px-1"
@@ -132,6 +135,12 @@ export default component$<Props>(
                   onClick={$(() => duplicateField(fieldEntity.id))}
                 />
               </span>
+              <button
+                class="btn btn-outline-dark p-0 px-1 ms-2"
+                onClick$={() => (editEntityId.value = fieldEntity.id)}
+              >
+                <i class="bi bi-pen"></i>
+              </button>
               <button
                 class="ms-2 btn btn-outline-dark btn-sm  p-0 px-1"
                 onClick$={() => removeField(fieldEntity.id)}

@@ -108,9 +108,11 @@ export default component$<Props>(
         targetId: string
       ) => {
         const key = entityType === "column" ? "columns" : "fields";
-
+        // current entity index
         const targetIndex = formLayout[key].findIndex((e) => e.id === targetId);
+
         if (targetIndex >= 0) {
+          // get current entity
           const target = { ...formLayout[key][targetIndex] };
           const filteredArray = formLayout[key].filter(
             (e) => e.parentId === target.parentId
